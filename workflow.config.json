@@ -1,0 +1,33 @@
+{
+  "workflow_description": {
+    "name":"somaticseq_variant_calling",
+    "version": 1.0,
+    "label":"SomaticSeq Variant Calling",
+    "type":"somaticseq_variant_calling",
+    "inputs":"mapped/{sample}.bam",
+    "outputs":[
+      "map_qc/cross_sample_correlation/{lib_name}.cross_sample_correlation.snps.html",
+      "map_qc/cross_sample_correlation/{lib_name}.cross_sample_correlation.snps.tsv",
+      "map_qc/cross_sample_correlation/{lib_name}.cross_sample_correlation.Rdata",
+      "map_qc/cross_sample_correlation/{sample}.snp.vcf",
+      "map_qc/picard/{sample}.picard.tsv",
+      "map_qc/qualimap/{sample}/qualimapReport.pdf",
+      "map_qc/samtools/{sample}.idxstats.tsv",
+      "map_qc/samtools/{sample}.flagstat.tsv"
+    ]
+  },
+  "general_params": [
+    "library_name",
+    "sample_name"
+  ],
+ "gui_params" : {
+    "detailed": {
+      "additional_fastqc_options": {
+        "label": "Additional options to fastqc call",
+        "type": "string",
+        "default": ""
+      }
+    }
+  }
+}
+
