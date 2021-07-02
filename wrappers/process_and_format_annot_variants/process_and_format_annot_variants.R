@@ -20,6 +20,7 @@ fread_vector_of_files <- function(file_list,regex,add_column = "sample"){
 
 
 annotate_with_intervals <- function(var_tab,annot_tab,annotate_cols_names = tail(names(annot_tab),1)){
+  var_tab <- var_tab[, chrom:=as.character(chrom)]  #conversion to char, cause X,Y chromosomes
   location_tab <- var_tab[,list(chrom,start = pos,end = pos)]
   location_tab <- unique(location_tab)
   setnames(annot_tab,names(annot_tab)[1:3],c("chrom", "start", "end"))
