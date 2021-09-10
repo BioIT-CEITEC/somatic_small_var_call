@@ -20,7 +20,6 @@ fread_vector_of_files <- function(file_list,regex,add_column = "sample"){
 
 
 annotate_with_intervals <- function(var_tab,annot_tab,annotate_cols_names = tail(names(annot_tab),1)){
-  var_tab <- var_tab[, chrom:=as.character(chrom)]  #conversion to char, cause X,Y chromosomes
   location_tab <- var_tab[,list(chrom,start = pos,end = pos)]
   location_tab <- unique(location_tab)
   setnames(annot_tab,names(annot_tab)[1:3],c("chrom", "start", "end"))
@@ -72,7 +71,7 @@ run_all <- function(args){
 
   final_formated_tab <- format_final_var_table(final_unformated_tab,global_format_configs,col_config)
   
-  write_out_per_sample_vars(final_formated_tab,per_sample_results_dir,full_format_configs,output_file,col_config)
+  write_out_per_sample_vars(final_formated_tab,per_sample_results_dir,full_format_configs,output_file,col_config,var_files)
   
   #print cast var_table
   final_formated_tab[,is_in := 1]
@@ -165,7 +164,7 @@ format_final_var_table  <- function(variant_tab,global_format_configs,col_config
   return(variant_tab)
 }
 
-write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_format_configs,output_file,col_config){
+write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_format_configs,output_file,col_config,var_files){
   
   if(!dir.exists(per_sample_results_dir)){
     dir.create(per_sample_results_dir)
@@ -207,6 +206,7 @@ write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_f
     } else {
       openxlsx::write.xlsx(sample_tab,file = paste0(per_sample_results_dir,"/",my_sample,".variants.xlsx"))
     }
+    
   }
   
   if(length(empty_sample_names) > 0){
@@ -218,9 +218,27 @@ write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_f
     
     for(empty_sample_name in empty_sample_names){
       openxlsx::write.xlsx(sample_tab,file = paste0(per_sample_results_dir,"/",my_sample,".variants.xlsx"))
-      fwrite(unformated_sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",my_sample,".variants.tsv"),sep = "\t")
+      fwrite(sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",my_sample,".variants.tsv"),sep = "\t")
+      # MODIFIED 10.9.2021 unformated_sample_tab ---- > sample_tab
+      # fwrite(unformated_sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",my_sample,".variants.tsv"),sep = "\t")
     }
   }
+  
+  # # MODIFIED 10.9.2021 - pridano var_files do argumentu funkce a pridan IF aby se zapsal i soubor pro samply bez variant
+  #PRO PRAZDNE SAMPLY:
+  if( length(var_files)!=length(unique(variant_tab$sample))){
+    # get sample names
+    temp <- strsplit(var_files, split = "/", fixed = TRUE)
+    temp <- unlist(temp)[2*(1:length(var_files))]
+    sample_names <- gsub(".variants.tsv", "", temp)
+    my_sample <- setdiff(sample_names,unique(variant_tab$sample))
+    sample_tab <-data.frame()
+    for(x in my_sample){
+    openxlsx::write.xlsx(sample_tab,file = paste0(per_sample_results_dir,"/",x,".variants.xlsx"))
+    fwrite(sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",x,".variants.tsv"),sep = "\t")
+    }
+  }
+  
 
 }
 
@@ -230,7 +248,8 @@ empty_sample_names <<- character()
 # develop and test
 # setwd("/mnt/ssd/ssd_1/snakemake/stage359_PC.seq_A/somatic_variant_calling")
 # args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","/home/98640/BioRoots/workflows/paired_somatic_small_var_call/resources/formats/default_new.txt","0","somatic_seq_results/Pca_4.variants.tsv","somatic_seq_results/Pca_5.variants.tsv","somatic_seq_results/Pca_6.variants.tsv","somatic_seq_results/Pca_7.variants.tsv","somatic_seq_results/Pca_8.variants.tsv","somatic_seq_results/Pca_10.variants.tsv","somatic_seq_results/Pca_11.variants.tsv","somatic_seq_results/Pca_12.variants.tsv","somatic_seq_results/Pca_13.variants.tsv","somatic_seq_results/Pca_17.variants.tsv","somatic_seq_results/Pca_18.variants.tsv","somatic_seq_results/Pca_19.variants.tsv","somatic_seq_results/Pca_20.variants.tsv","somatic_seq_results/Pca_21.variants.tsv","somatic_seq_results/Pca_22.variants.tsv","somatic_seq_results/Pca_23.variants.tsv","somatic_seq_results/Pca_24.variants.tsv","somatic_seq_results/Pca_25.variants.tsv","somatic_seq_results/Pca_26.variants.tsv")
-
+# setwd("/mnt/ssd/ssd_1/snakemake/stage447_ACGT03A.Pca_E48/somatic_seq")
+# args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","/home/402182/somatic_small_var_call_BETA/resources/formats/slaby_children_soma.txt","0","somatic_seq_results/PCA_88.variants.tsv","somatic_seq_results/PCA_89.variants.tsv","somatic_seq_results/PCA_91.variants.tsv","somatic_seq_results/PCA_92.variants.tsv","somatic_seq_results/PCA_93.variants.tsv","somatic_seq_results/PCA_95.variants.tsv","somatic_seq_results/PCA_96.variants.tsv","somatic_seq_results/PCA_97.variants.tsv","somatic_seq_results/PCA_98.variants.tsv","somatic_seq_results/PCA_99.variants.tsv","somatic_seq_results/PCA_100.variants.tsv","somatic_seq_results/PCA_103.variants.tsv","somatic_seq_results/PCA_104.variants.tsv","somatic_seq_results/PCA_107.variants.tsv","somatic_seq_results/PCA_108.variants.tsv","somatic_seq_results/PCA_109.variants.tsv","somatic_seq_results/PCA_110.variants.tsv","somatic_seq_results/PCA_111.variants.tsv","somatic_seq_results/PCA_112.variants.tsv","somatic_seq_results/PCA_113.variants.tsv","somatic_seq_results/PCA_114.variants.tsv","somatic_seq_results/PCA_115.variants.tsv","somatic_seq_results/PCA_116.variants.tsv","somatic_seq_results/PCA_117.variants.tsv")
 #run as Rscript
 # 
 args <- commandArgs(trailingOnly = T)

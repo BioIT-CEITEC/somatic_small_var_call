@@ -181,7 +181,7 @@ rule vardict:
     output:
         vcf = "variant_calls/{sample_name}/vardict/VarDict.vcf"
     log: "logs/{sample_name}/callers/vardict.log"
-    threads: 10
+    threads: 1
     resources:
         mem_mb=8000
     params:

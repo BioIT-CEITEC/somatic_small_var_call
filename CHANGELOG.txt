@@ -1,0 +1,6 @@
+VARDICT rule yaml - problemy s verzi 1.7 out of nothing, upgrade na 1.8.2 (upravuje nejake dalsi chyby, je v snakemake wrappers), funguje?
+VARDICT rule wrapper  - vymazal jsem "2> logfile" z pomocneho skriptu wrapperu ktere se stejne nepouzivali, vardict nema skoro zadny logovani... Pripadne zkontrolovat. 
+
+postprocess_somaticseq_variants.R  - pridany IF  ELSE vyjimky pokud je Consensus INDEL prazdny. Stalo se u PCA_116 z datasetu PCA-E48. 
+
+process_and_format_annot_variants.R - 10.9.2021 - opravena chybejici promenna unformated_sample_tab - nahrazeno za sample_tab, nove se zapisou prazdne soubory pro samply bez nalezenych variant
