@@ -58,6 +58,14 @@ f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
+# remove workspace - lots of files messing copying speeds
+shell("rm -fR " + snakemake.params.dir + "/workspace")
+
+
+
+
+
+
 # command = "gatk MergeVcfs " + \
 #         " -I "+ snakemake.params.dir + "/results/variants/somatic.indels.vcf.gz "+\
 #         " -I "+ snakemake.params.dir + "/results/variants/somatic.snvs.vcf.gz "+\

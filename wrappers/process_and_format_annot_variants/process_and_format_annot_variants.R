@@ -18,12 +18,18 @@ fread_vector_of_files <- function(file_list,regex,add_column = "sample"){
   return(rbindlist(list_of_tabs))
 }
 
-
 annotate_with_intervals <- function(var_tab,annot_tab,annotate_cols_names = tail(names(annot_tab),1)){
+  # MODIFIED 16.9.2021 - datatype checked to character, when only numeric chromosomes are listed, its fread as integer
+  # Incompatible join types: x.chrom (character) and i.chrom (integer)
+  class(var_tab$chrom) = "character" # CHANGED 16.9.2021
+  
   location_tab <- var_tab[,list(chrom,start = pos,end = pos)]
   location_tab <- unique(location_tab)
   setnames(annot_tab,names(annot_tab)[1:3],c("chrom", "start", "end"))
   setkey(annot_tab, chrom, start, end)
+  
+
+  
   res <- foverlaps(location_tab, annot_tab, type="any")
   res <- res[,c("chrom","i.start",annotate_cols_names),with = F]
   setnames(res,names(res)[1:2],c("chrom", "pos"))
@@ -97,6 +103,7 @@ filter_variants <- function(all_var_tab,VF_threshold = 0,coverage_alarm = c(1,10
   
   return(all_var_tab)
 }
+
 
 
 compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs){
@@ -217,8 +224,8 @@ write_out_per_sample_vars  <- function(variant_tab,per_sample_results_dir,full_f
 
     
     for(empty_sample_name in empty_sample_names){
-      openxlsx::write.xlsx(sample_tab,file = paste0(per_sample_results_dir,"/",my_sample,".variants.xlsx"))
-      fwrite(sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",my_sample,".variants.tsv"),sep = "\t")
+      openxlsx::write.xlsx(sample_tab,file = paste0(per_sample_results_dir,"/",empty_sample_name,".variants.xlsx"))
+      fwrite(sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",empty_sample_name,".variants.tsv"),sep = "\t")
       # MODIFIED 10.9.2021 unformated_sample_tab ---- > sample_tab
       # fwrite(unformated_sample_tab,file = paste0(per_sample_results_dir,"/tsv_formated/",my_sample,".variants.tsv"),sep = "\t")
     }
@@ -250,6 +257,10 @@ empty_sample_names <<- character()
 # args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","/home/98640/BioRoots/workflows/paired_somatic_small_var_call/resources/formats/default_new.txt","0","somatic_seq_results/Pca_4.variants.tsv","somatic_seq_results/Pca_5.variants.tsv","somatic_seq_results/Pca_6.variants.tsv","somatic_seq_results/Pca_7.variants.tsv","somatic_seq_results/Pca_8.variants.tsv","somatic_seq_results/Pca_10.variants.tsv","somatic_seq_results/Pca_11.variants.tsv","somatic_seq_results/Pca_12.variants.tsv","somatic_seq_results/Pca_13.variants.tsv","somatic_seq_results/Pca_17.variants.tsv","somatic_seq_results/Pca_18.variants.tsv","somatic_seq_results/Pca_19.variants.tsv","somatic_seq_results/Pca_20.variants.tsv","somatic_seq_results/Pca_21.variants.tsv","somatic_seq_results/Pca_22.variants.tsv","somatic_seq_results/Pca_23.variants.tsv","somatic_seq_results/Pca_24.variants.tsv","somatic_seq_results/Pca_25.variants.tsv","somatic_seq_results/Pca_26.variants.tsv")
 # setwd("/mnt/ssd/ssd_1/snakemake/stage447_ACGT03A.Pca_E48/somatic_seq")
 # args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","/home/402182/somatic_small_var_call_BETA/resources/formats/slaby_children_soma.txt","0","somatic_seq_results/PCA_88.variants.tsv","somatic_seq_results/PCA_89.variants.tsv","somatic_seq_results/PCA_91.variants.tsv","somatic_seq_results/PCA_92.variants.tsv","somatic_seq_results/PCA_93.variants.tsv","somatic_seq_results/PCA_95.variants.tsv","somatic_seq_results/PCA_96.variants.tsv","somatic_seq_results/PCA_97.variants.tsv","somatic_seq_results/PCA_98.variants.tsv","somatic_seq_results/PCA_99.variants.tsv","somatic_seq_results/PCA_100.variants.tsv","somatic_seq_results/PCA_103.variants.tsv","somatic_seq_results/PCA_104.variants.tsv","somatic_seq_results/PCA_107.variants.tsv","somatic_seq_results/PCA_108.variants.tsv","somatic_seq_results/PCA_109.variants.tsv","somatic_seq_results/PCA_110.variants.tsv","somatic_seq_results/PCA_111.variants.tsv","somatic_seq_results/PCA_112.variants.tsv","somatic_seq_results/PCA_113.variants.tsv","somatic_seq_results/PCA_114.variants.tsv","somatic_seq_results/PCA_115.variants.tsv","somatic_seq_results/PCA_116.variants.tsv","somatic_seq_results/PCA_117.variants.tsv")
+# args <- c("annotate/all_variants.annotated.processed.tsv","final_variant_table.tsv","mutation_loads.xlsx","per_sample_final_var_tabs","/home/402182/somatic_small_var_call_BETA/resources/formats/slaby_children_soma.txt","0","somatic_seq_results/DK1810.variants.tsv")
+# setwd("/mnt/ssd/ssd_1/snakemake/REANALYZY/68_WES/somatic_seq")
+
+
 #run as Rscript
 # 
 args <- commandArgs(trailingOnly = T)
