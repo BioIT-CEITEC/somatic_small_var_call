@@ -1,6 +1,6 @@
 import re
 
-if config["calling_type"] == "paired":
+if config["is_paired"] == True:
     available_varcallers = {
         "muse":"single_output",
         "mutect2":"single_output",
@@ -53,7 +53,7 @@ rule somaticseq:
         unpack(bam_inputs),
         caller_output = individual_caller_outputs,
         ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference"])[0],
-        regions =  expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir = reference_directory,library_scope = config["library_scope"])[0],
+        regions =  expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir = reference_directory,library_scope = config["lib_ROI"])[0],
         dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0]
     output:
         snv="somatic_seq_results/{sample_name}/Consensus.sSNV.vcf",
@@ -64,7 +64,7 @@ rule somaticseq:
         mem_mb=8000
     params:
         mincallers = 0.4,
-        calling_type = config["calling_type"],
+        calling_type = config["is_paired"],
         inputflags = inputflags,
     conda:  "../wrappers/somaticseq/env.yaml"
     script: "../wrappers/somaticseq/script.py"
@@ -81,6 +81,6 @@ rule postprocess_somaticseq_variants:
     resources:
         mem_mb=8000
     params:
-        calling_type=config["calling_type"]
+        calling_type=config["is_paired"]
     conda:  "../wrappers/postprocess_somaticseq_variants/env.yaml"
     script: "../wrappers/postprocess_somaticseq_variants/script.py"

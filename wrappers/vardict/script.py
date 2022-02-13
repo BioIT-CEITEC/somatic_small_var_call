@@ -10,13 +10,13 @@ from snakemake.shell import shell
 
 log_filename = str(snakemake.log)
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     TEST_STRAND_BIAS = os.path.abspath(os.path.dirname(__file__))+"/testsomatic.R"
 else:
     TEST_STRAND_BIAS = os.path.abspath(os.path.dirname(__file__)) + "/teststrandbias.R"
 
 #changed in newer VARDICT versions, VAR2VCF is different for single/paired samples
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     VAR2VCF = os.path.abspath(os.path.dirname(__file__))+"/var2vcf_paired.pl"
 else:
     VAR2VCF = os.path.abspath(os.path.dirname(__file__))+"/var2vcf_valid.pl"
@@ -38,7 +38,7 @@ f.close()
 #AttributeError: 'Wildcards' object has no attribute 'full_name'
 # replace 'full_name' with fullname
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     # TEST_STRAND_BIAS = os.path.abspath(os.path.dirname(__file__)) + "/testsomatic.R"
     # VAR2VCF = os.path.abspath(os.path.dirname(__file__)) + "/var2vcf_somatic.pl"
 

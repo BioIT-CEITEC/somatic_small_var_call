@@ -18,7 +18,7 @@ shell.executable("/bin/bash")
 # f.write("## VERSION: vardict-java "+version+"\n")
 # f.close()
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     command = "lofreq somatic " + \
               " --threads " + str(snakemake.threads) + \
               " -t " + snakemake.input.tumor + \

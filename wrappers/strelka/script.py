@@ -27,7 +27,7 @@ else:
 
 shell("rm -fR " + snakemake.params.dir)
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     command = "configureStrelkaSomaticWorkflow.py" + \
               scope + \
               " --normalBam " + snakemake.input.normal + \

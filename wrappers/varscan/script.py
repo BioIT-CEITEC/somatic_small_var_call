@@ -19,7 +19,7 @@ shell.executable("/bin/bash")
 extra_params = snakemake.params.get("extra", "")
 
 # Building output dirs
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     makedirs(os.path.dirname(snakemake.output.snp))
     makedirs(os.path.dirname(snakemake.output.indel))
 else:
@@ -38,7 +38,7 @@ f.write("## COMMAND: " + command + "\n")
 f.close()
 shell(command)
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     command = "samtools mpileup -B -q 1 -Q 20  " + \
               " --positions " + snakemake.input.regions + \
               " -f " + snakemake.input.ref + \
@@ -56,7 +56,7 @@ if snakemake.params.calling_type == "paired":
 # Output prefix
 
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     prefix = os.path.splitext(os.path.splitext(snakemake.output.snp)[0])[0]
     command = "varscan somatic" \
               " " + snakemake.params.normal_pileup + \

@@ -15,3 +15,39 @@ STRELKA rule wrapper - po dokonceni skriptu se smaze slozka workspace
 postprocess_somaticseq_variants.R - pridano class(location_tab$chrom) = "character" do funkce "annotate_with_intervals"
                         # MODIFIED 16.9.2021 - datatype checked to character, when only numeric chromosomes are listed, its fread as integer
                         # Incompatible join types: x.chrom (character) and i.chrom (integer)
+
+########################################################################################################################
+13.12.2021 vetev SEKVOJA
+
+Snakefile - sample_tab upraven do puvodni podoby z noveho JSONU
+callers.smk - upravena input funkce pro mutect headers (stejne jako sample_names)
+dalsi pravidla - JSON nove
+    calling_type > "is_paired",
+    "reference", stejne
+    library_scope > "lib_ROI"
+
+########################################################################################################################
+LEDEN 2022
+GLOBAL_REF_PATH = "/mnt/references/"   misto mnt/ssd3/references - kvuli Dockeru
+
+config["calling_type"]  zmeneno na  config["is_paired"]
+ve wrapperech zmeneno   snakemake.params.calling_type=="paired" na snakemake.params.calling_type:
+"../input_files/mapped/ "  zmeneno na "mapped/"
+
+
+POZNAMKY:
+single sample - bude chyba v R skriptech
+is_paired - jak se nastavuje? je required - zdedeno z alignment
+
+JSON values not used? or required:
+
+config["material"] - nastaveno ve SnakeFile napevno na "DNA"
+config["not_use_merged"] - ve workflow.config.json na False by default
+
+config["organism"] - based on libROI
+config["reference"] - based on libROI
+
+slaby_children_soma.txt zmeneno /mnt/ssd/ssd_3 na mnt/references
+OVERIT ##### Reference processing
+
+13.2.2022 FIRST RELEASE

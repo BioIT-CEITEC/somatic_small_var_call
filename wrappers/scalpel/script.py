@@ -20,7 +20,7 @@ shell.executable("/bin/bash")
 # f.write("## VERSION: vardict-java "+version+"\n")
 # f.close()
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     command = "scalpel-discovery --somatic " + \
               " --ref " + snakemake.input.ref + \
               " --bed " + snakemake.input.regions + \

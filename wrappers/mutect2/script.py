@@ -37,7 +37,7 @@ shell(command)
 
 non_filtered_vcf = snakemake.output.vcf.replace(".vcf",".not_filtered.vcf")
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     command = "gatk --java-options \"-Xmx30g \" Mutect2" + \
               " -R " + snakemake.input.ref + \
               " -I " + snakemake.input.tumor + \

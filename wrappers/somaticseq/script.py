@@ -18,7 +18,7 @@ shell.executable("/bin/bash")
 # f.write("## VERSION: vardict-java "+version+"\n")
 # f.close()
 
-if snakemake.params.calling_type == "paired":
+if snakemake.params.calling_type:
     call_type = "paired"
     bam_inputs = " --tumor-bam-file " + snakemake.input.tumor + " --normal-bam-file " + snakemake.input.normal
 else:
