@@ -1,6 +1,8 @@
 import os
 import pandas as pd
 
+configfile: "config.json"
+
 GLOBAL_REF_PATH = "/mnt/references/"
 # JSON validation, only the description and parameters part, not the samples part
 # from snakemake.utils import validate
