@@ -1,7 +1,8 @@
 import os
 import pandas as pd
 
-GLOBAL_REF_PATH = "/mnt/references/"
+configfile: "config.json"
+GLOBAL_REF_PATH = config["globalResources"]
 # JSON validation, only the description and parameters part, not the samples part
 # from snakemake.utils import validate
 #validate(config, "config.schema.json")
