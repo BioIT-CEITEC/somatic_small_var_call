@@ -18,7 +18,8 @@ rule process_and_format_annot_variants:
     params: reference = config["reference"],
             min_variant_frequency = str(config["min_variant_frequency"]),
             format = config["format"],
-            anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])
+            anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"]),
+            ref_dir = reference_directory
     conda:  "../wrappers/process_and_format_annot_variants/env.yaml"
     script: "../wrappers/process_and_format_annot_variants/script.py"
 

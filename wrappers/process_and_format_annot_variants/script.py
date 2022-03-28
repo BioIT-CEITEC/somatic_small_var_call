@@ -17,6 +17,7 @@ command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/process_and_fo
             os.path.dirname(snakemake.output.per_sample_var_tabs[0]) + " " +\
             snakemake.input.format_file + " " +\
             snakemake.params.min_variant_frequency + " " +\
+            snakemake.params.ref_dir + " " +\
             " ".join(snakemake.input.var_tabs) +\
             " >> " + log_filename + " 2>&1"
 

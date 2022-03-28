@@ -44,8 +44,9 @@ run_all <- function(args){
   mut_load_output_file <- args[3]
   per_sample_results_dir <- args[4]
   format_file <- args[5]
-  VF_threshold <- as.numeric(args[6]) / 100  
-  var_files <- args[7:length(args)]
+  VF_threshold <- as.numeric(args[6]) / 100
+  reference_directory <- args[7]
+  var_files <- args[8:length(args)]
 
   
   #load format config file
@@ -67,7 +68,7 @@ run_all <- function(args){
   final_unformated_tab <- merge(all_var_tab,annot_tab,by = "var_name",allow.cartesian=TRUE)
   
   if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO")){
-    compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs)
+    compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs,reference_directory)
   } else {
     system(paste0("touch ",mut_load_output_file))
   }
@@ -106,7 +107,7 @@ filter_variants <- function(all_var_tab,VF_threshold = 0,coverage_alarm = c(1,10
 
 
 
-compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs){
+compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs,reference_directory){
   variant_tab <- unique(variant_tab,by = c("sample","var_name"))
   mut_load_config <- as.data.table(tstrsplit(global_format_configs[V1 == "mut_load"]$V2,split = "::"))
   
@@ -115,7 +116,7 @@ compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_
     
     filter_text <- trimws(mut_load_config[index,]$V3)
     filtered_var_table <- eval(parse(text = paste0("variant_tab[",filter_text,"]")))
-    intervals <- fread(mut_load_config[index,]$V2)
+    intervals <- fread(paste0(reference_directory,"/",mut_load_config[index,]$V2))
     intervals[,is_in := "x"]
     
     filtered_var_table <- annotate_with_intervals(filtered_var_table,intervals,annotate_cols_names = "is_in")
