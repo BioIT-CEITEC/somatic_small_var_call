@@ -2,7 +2,7 @@
   "workflow_description": {
     "name":"somatic_small_var_call",
     "version": 1.0,
-    "label":"Somatic small variant calling 03032022",
+    "label":"Somatic small variant calling - dev_custom_annot",
     "type":"somatic_small_var_call",
     "inputs":[
       "mapped/{sample}.bam*"
@@ -17,7 +17,7 @@
       "logs/*",
       "per_sample_final_var_tabs/*",
       "somatic_seq_results/*",
-      "taskrunner/*",
+      ".taskrunner/*",
       "variant_calls/*"
     ],
     "report_index": "annotate/all_variants.annotated.tsv_summary.html",
