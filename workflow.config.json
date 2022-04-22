@@ -11,13 +11,10 @@
       "final_variant_table.xlsx",
       "final_variant_table.tsv",
       "mutation_loads.xlsx",
-      "config.json",
-      "*.reports.zip",
       "annotate/*",
       "logs/*",
       "per_sample_final_var_tabs/*",
       "somatic_seq_results/*",
-      "taskrunner/*",
       "variant_calls/*"
     ],
     "report_index": "annotate/all_variants.annotated.tsv_summary.html",
