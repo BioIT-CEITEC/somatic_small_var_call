@@ -11,6 +11,7 @@
       "final_variant_table.xlsx",
       "final_variant_table.tsv",
       "mutation_loads.xlsx",
+      "config.json",
       "annotate/*",
       "logs/*",
       "per_sample_final_var_tabs/*",
