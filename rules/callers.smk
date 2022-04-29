@@ -9,7 +9,7 @@ def bam_inputs(wildcards):
         return {'tumor': expand("mapped/{tumor_bam}.{tag}",tumor_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"],tag=tag)[0], \
                 'normal': expand("mapped/{normal_bam}.{tag}",normal_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_normal"],tag=tag)[0]}
     else:
-        return {'tumor': expand("mapped/{tumor_bam}.{tag}",tumor_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"],tag=tag)[0]}
+        return {'tumor': expand("mapped/{tumor_bam}.{tag}",tumor_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name"],tag=tag)[0]}
 
 # def mpileup_bam_input(wildcards):
 #     if config["material"] != "RNA":
@@ -26,7 +26,7 @@ def sample_orig_bam_names(wildcards):
         return {'tumor': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"])[0], \
                 'normal': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_normal"])[0]}
     else:
-        return {'tumor': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"])[0]}
+        return {'tumor': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name"])[0]}
 
 
 rule somaticsniper:
