@@ -32,16 +32,6 @@
         "label": "Somatic variant callers to use",
         "type": "string",
         "default": "strelka;vardict;mutect2;somaticsniper;lofreq;muse;varscan"
-      },
-      "format": {
-        "label": "Result variant table format ",
-        "type": "enum",
-        "default": "default",
-        "list": {
-          "default": "Default format",
-          "BRONCO": "BRONCO",
-          "slaby_children_soma" : "Pediatric oncology project format somatic"
-        }
       }
     },
     "detailed": {
@@ -54,11 +44,6 @@
         "label": "Varscan: Extra parameters",
         "type": "string",
         "default": "--strand-filter 0 --p-value 0.95 --min-var-freq 0.05"
-      },
-      "not_use_merged": {
-        "label": "VEP: not_use_merged",
-        "type": "bool",
-        "default": false
       }
     },
     "samples": {
