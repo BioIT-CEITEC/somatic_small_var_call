@@ -1,29 +1,21 @@
 {
   "workflow_description": {
     "name":"somatic_small_var_call",
-    "version": 1.0,
-    "label":"Somatic small variant calling 03032022",
+    "version": 1.2,
+    "label":"Somatic small variant calling",
     "type":"somatic_small_var_call",
     "inputs":[
       "mapped/{sample}.bam*"
     ],
     "outputs":[
-      "final_variant_table.xlsx",
-      "final_variant_table.tsv",
-      "mutation_loads.xlsx",
       "config.json",
-      "*.reports.zip",
-      "annotate/*",
       "logs/*",
-      "per_sample_final_var_tabs/*",
       "somatic_seq_results/*",
-      ".taskrunner/*",
-      "variant_calls/*"
+      "variant_calls/*",
+      "merged/*"
     ],
-    "report_index": "annotate/all_variants.annotated.tsv_summary.html",
-    "reports":[
-      "annotate/all_variants.annotated.tsv_summary.html"
-    ]
+    "report_index": "",
+    "reports": ""
   },
   "general_params": [
     "entity_name",
