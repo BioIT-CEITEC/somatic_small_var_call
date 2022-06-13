@@ -14,8 +14,8 @@
       "variant_calls/*",
       "merged/*"
     ],
-    "report_index": "",
-    "reports": ""
+    "report_index":,
+    "reports":
   },
   "general_params": [
     "entity_name",
