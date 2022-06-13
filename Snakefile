@@ -11,14 +11,16 @@ GLOBAL_REF_PATH = "/mnt/references/"
 
 ##### Config processing #####
 #conversion from new json
-sample_tab_initial = pd.DataFrame.from_dict(config["samples"],orient="index")
-sample_tab = pd.DataFrame({"sample_name" : [],"sample_name_normal" : [],"sample_name_tumor" : []})
-sample_tab["sample_name"]=sample_tab_initial["donor"].unique()    
-for index, row in sample_tab.iterrows():
-    sample_tab.loc[index,"sample_name_normal"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="normal"),"sample_name"].to_string(index=False)
-    sample_tab.loc[index,"sample_name_tumor"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="tumor"),"sample_name"].to_string(index=False)
-    # print(row["donor"])
-    # print(index)
+if config["tumor_normal_paired"]:
+    sample_tab_initial = pd.DataFrame.from_dict(config["samples"],orient="index")
+    sample_tab = pd.DataFrame({"sample_name" : [],"sample_name_normal" : [],"sample_name_tumor" : []})
+    sample_tab["sample_name"]=sample_tab_initial["donor"].unique()
+    for index, row in sample_tab.iterrows():
+        sample_tab.loc[index,"sample_name_normal"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="normal"),"sample_name"].to_string(index=False)
+        sample_tab.loc[index,"sample_name_tumor"] = sample_tab_initial.loc[(sample_tab_initial["donor"]==row["sample_name"]) & (sample_tab_initial["tumor_normal"]=="tumor"),"sample_name"].to_string(index=False)
+else:
+    sample_tab = pd.DataFrame.from_dict(config["samples"],orient="index")
+
 
 ##### Reference processing
 #

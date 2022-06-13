@@ -58,3 +58,7 @@ pridano config.json do Snakefile
 custom_annotation - pridana moznost aby se custom_db slozka dala definovat, podobne jako u germinalu + pridany upravene soubory pro GRCh38,
 a aktualizovane Cosmic CGC, Clinvar,...
 final_processing... - TMB se pocita i podle GRCh38 oblasti, pridan vstup pro typ reference a uplift BED filu pro EXOMY A FONE
+
+
+########################################################################################################################
+DUBEN 2022

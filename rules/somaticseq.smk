@@ -1,6 +1,6 @@
 import re
 
-if config["is_paired"] == True:
+if config["tumor_normal_paired"] == True:
     available_varcallers = {
         "muse":"single_output",
         "mutect2":"single_output",
@@ -64,7 +64,7 @@ rule somaticseq:
         mem_mb=8000
     params:
         mincallers = 0.4,
-        calling_type = config["is_paired"],
+        calling_type = config["tumor_normal_paired"],
         inputflags = inputflags,
     conda:  "../wrappers/somaticseq/env.yaml"
     script: "../wrappers/somaticseq/script.py"
@@ -81,6 +81,6 @@ rule postprocess_somaticseq_variants:
     resources:
         mem_mb=8000
     params:
-        calling_type=config["is_paired"]
+        tumor_normal_paired=config["tumor_normal_paired"]
     conda:  "../wrappers/postprocess_somaticseq_variants/env.yaml"
     script: "../wrappers/postprocess_somaticseq_variants/script.py"
