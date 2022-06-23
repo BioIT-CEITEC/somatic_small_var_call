@@ -13,9 +13,7 @@
       "somatic_seq_results/*",
       "variant_calls/*",
       "merged/*"
-    ],
-    "report_index":,
-    "reports":
+    ]
   },
   "general_params": [
     "entity_name",
