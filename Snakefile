@@ -30,7 +30,7 @@ if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "RNA":
     f.close()
     config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
 else:
-    config["lib_ROI"] = "no"
+    config["lib_ROI"] = "wgs"
     if config["lib_ROI"] == "RNA":
         config["material"] = "RNA"
 
