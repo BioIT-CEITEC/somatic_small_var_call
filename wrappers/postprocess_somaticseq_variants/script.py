@@ -13,7 +13,7 @@ f.close()
 
 shell.executable("/bin/bash")
 
-if snakemake.params.calling_type:
+if snakemake.params.tumor_normal_paired:
     calling_type_string = "paired"
 else:
     calling_type_string = "single"

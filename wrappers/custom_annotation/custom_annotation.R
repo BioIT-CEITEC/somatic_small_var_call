@@ -25,10 +25,10 @@ fread_vector_of_files <- function(file_list,regex,add_column = "sample"){
     } else {
       return(NULL)
     }
-  })  
+  })
   if(any(sapply(list_of_tabs,is.null))){
     empty_sample_names <<- gsub(regex,"\\1",file_list[sapply(list_of_tabs,is.null)])
-  }  
+  }
   return(rbindlist(list_of_tabs))
 }
 
@@ -47,9 +47,9 @@ annotate_with_intervals <- function(var_tab,annot_tab,annotate_cols_names = tail
 
 
 extract_existing_variations_to_separate_cols <- function(Existing_variation_vector){
-  
+
   split_variant_list <- strsplit(Existing_variation_vector,",")
-  
+
   res_mat <- sapply(split_variant_list,function(x) {
     if(x[1] != "-"){
       return(sapply(extracted_DBs_IDs,function(y) paste(x[grep(y,x)],collapse = ",")))
@@ -64,18 +64,18 @@ extract_existing_variations_to_separate_cols <- function(Existing_variation_vect
 }
 
 
-add_custom_DB <- function(tab,custom_DBs){
+add_custom_DB <- function(tab,custom_DBs,custom_DB_folder){
   location_tab <- as.data.table(tstrsplit(tab$var_name,"_",names = c("chrom","pos","t"),type.convert = T)[1:2])
   location_tab[,type := "b_var"][,index := seq_along(type)]
   setorder(location_tab)
-  
-  
+
+
   for(DB_text in custom_DBs){
     DB_name_split <- strsplit(DB_text,":")[[1]]
     DB_name <- DB_name_split[1]
-    DB_filename <- list.files("/mnt/references/homsap/GRCh37-p13/annot/custom",pattern = DB_name,full.names = T)
+    DB_filename <- list.files(custom_DB_folder,pattern = DB_name,full.names = T)
     if(length(DB_filename) == 1){
-      orig_DB <- fread(DB_filename)
+      orig_DB <- fread(DB_filename,sep = "\t",quote="")
       DB <- orig_DB[, c(T,lapply(orig_DB[,-1,with = FALSE], is.numeric) == TRUE), with = FALSE]
       orig_DB <- unique(orig_DB,by = names(DB)[1:3])
       setorder(orig_DB)
@@ -103,7 +103,7 @@ add_custom_DB <- function(tab,custom_DBs){
           for(col in cols_with_DB_name){
             tab[tab[[col]] == "",(col) := "."]
           }
-          
+
         } else {
           tab[,(DB_name) := "."]
           tab[select_DB$index,(DB_name) := "yes"]
@@ -114,12 +114,12 @@ add_custom_DB <- function(tab,custom_DBs){
 }
 
 
-load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,resources_dir){
-  
+load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,resources_dir,custom_DB_folder,gtf_file){
+
   #READ ANNOTATION TABLE
   annot_tab <- fread(annot_file,sep = "\t",header = T,skip = "#Uploaded_variation",verbose = F,showProgress = F)
   setnames(annot_tab,"#Uploaded_variation","var_name")
-  
+
   annot_tab_extra_parse <- annot_tab$Extra
   annot_tab_extra_parse <- strsplit(annot_tab_extra_parse,";")
   annot_tab_extra_names_order <- order(unlist(lapply(annot_tab_extra_parse,seq_along)))
@@ -129,7 +129,7 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   annot_extra_index <- rep(seq_along(annot_extra_index),annot_extra_index)
   annot_tab_extra <- data.table(index = annot_extra_index,names = annot_extra_names,value = annot_extra_value)
   annot_tab_extra <- dcast.data.table(annot_tab_extra,formula = index ~ names,fill = NA,value.var = "value")
-  
+
   annot_tab <- cbind(annot_tab,annot_tab_extra)
   remove(annot_tab_extra)
   remove(annot_tab_extra_parse)
@@ -137,49 +137,49 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   remove(annot_extra_value)
   remove(annot_extra_index)
   remove(annot_tab_extra_names_order)
-  
+
   annot_tab[,Extra := NULL]
   annot_tab[,index := NULL]
-  
+
   annot_tab <- unique(annot_tab,by = c("var_name","Location","Allele","Gene","Feature","STRAND"))
   annot_tab <- annot_tab[,var_name := gsub("(.*/[^/]*)/.*","\\1",var_name)]
-  
+
   if(any(names(annot_tab) == "HGVSc")){
     annot_tab[,HGVSc := gsub(".*\\:c","c",HGVSc)]
   }
   if(any(names(annot_tab) == "HGVSp")){
     annot_tab[,HGVSp := gsub(".*\\:p","p",HGVSp)]
   }
-  
+
   if(any(names(annot_tab) == "HGVSp")){
     annot_tab[grep("synonymous_variant",Consequence),HGVSp := gsub("p\\.([^0-9]+)([0-9]+)\\%3D","p\\.=(p\\.\\1\\2\\1)",HGVSp)]
     for(idx in 1:nrow(aa_names_tab)){
       annot_tab[,HGVSp := gsub(aa_names_tab$three[idx],aa_names_tab$one[idx],HGVSp)]
     }
   }
-  
+
   # if(any(names(annot_tab) == "EUR_MAF")){
   #   annot_tab[,EUR_MAF := gsub("[ACGTN-]+:([01][^,]*).*","\\1",EUR_MAF)]
   # }
-  
+
   if(any(names(annot_tab) == "Consequence")){
     annot_tab[,gene_region := "exon"]
     annot_tab[grep("5_prime_UTR|splice|intron|downstream|upstream|3_prime_UTR|intergenic|mature_miRNA|non_coding|regulatory_region|TF_binding_site",Consequence)
               ,gene_region := gsub(".*(5_prime_UTR|splice|intron|downstream|upstream|3_prime_UTR|intergenic|mature_miRNA|non_coding|regulatory_region|TF_binding_site).*","\\1",Consequence)]
   }
-  
+
   if(any(names(annot_tab) == "Existing_variation")){
     add_tab <- cbind(Existing_variation = unique(annot_tab$Existing_variation)
                      ,extract_existing_variations_to_separate_cols(unique(annot_tab$Existing_variation)))
     annot_tab <- merge(annot_tab,add_tab,by = "Existing_variation")
   }
-  
+
   if(any(names(annot_tab) == "CLIN_SIG")){
-    load(paste0(resources_dir,"/clinvar_20180930.Rdata"))
+    load(paste0(custom_DB_folder,"/clinvar.Rdata"))
     annot_tab <- merge(annot_tab,clinvar_tab,by = "var_name",all.x = T)
     annot_tab[,CLIN_SIG := NULL]
   }
-  
+
   if(!any(names(annot_tab) == "SYMBOL")){
     if(file.exists(gtf_file)){
       gtf <- fread(gtf_file)
@@ -195,18 +195,18 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
       annot_tab[,BIOTYPE := "not_available"]
     }
   }
-  
+
   annot_tab[,c("chrom","pos","substitution") := as.data.table(tstrsplit(var_name,"_"))]
   annot_tab[,c("reference","alternative") := as.data.table(tstrsplit(substitution,"/"))]
   annot_tab[,pos := as.integer(pos)]
-  
-  
+
+
   for(col in names(annot_tab)) {
     if(is.character(annot_tab[[col]])){
       set(annot_tab, i=which(annot_tab[[col]]=="" | is.na(annot_tab[[col]])), j=col, value=".")
     }
   }
-  
+
   if(any(names(annot_tab) == "EXON")){
     annot_tab[EXON != ".",exon_intron_number := paste0("exon",gsub("\\/.*","",EXON))]
     if(any(names(annot_tab) == "INTRON")){
@@ -217,60 +217,60 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   } else {
     annot_tab[,full_annot_name := ""]
   }
-  
+
   consequence_tab <- fread(paste0(resources_dir,"/consequences_tab.tsv"),header = F)
   consequence_tab[,consequence_index := seq_along(V1)]
   consequence_map <- data.table(Consequence = unique(annot_tab$Consequence),V1 = sapply(strsplit(unique(annot_tab$Consequence),","),head,1))
   consequence_map <- merge(consequence_map,consequence_tab[,list(V1,consequence_index)],by = "V1")
   annot_tab <- merge(annot_tab,consequence_map[,list(Consequence,consequence_index)],by = "Consequence")
   annot_tab[,specific_transcript := Feature %in% gene_trans_spec]
-  
+
   annot_tab[,is_protein_coding := BIOTYPE == "protein_coding"]
-  
+
   non_protein_to_remove <- function(is_protein_coding){
     if(any(is_protein_coding)){
       return(!is_protein_coding)
-    } 
+    }
     else {
       return(FALSE)
     }
   }
-  
+
   annot_tab[,non_protein_coding_to_remove := non_protein_to_remove(is_protein_coding),by = c("var_name")]
   annot_tab <- annot_tab[non_protein_coding_to_remove == F]
-  
+
   columns_to_order <- c("specific_transcript","is_protein_coding","SOURCE","consequence_index","CANONICAL")
   order_direction <- c(-1,-1,-1,1,-1)
   order_direction <- order_direction[columns_to_order %in% names(annot_tab)]
   columns_to_order <- columns_to_order[columns_to_order %in% names(annot_tab)]
   setorderv(annot_tab,cols = columns_to_order,order = order_direction,na.last = T)
-  
+
   annot_tab[,all_full_annot_name := paste(unique(full_annot_name),collapse = ","),by = c("var_name","SYMBOL")]
   annot_tab <- unique(annot_tab,by = c("var_name","SYMBOL"))
-  
+
   setorder(annot_tab,chrom,pos)
-  
+
   if(!is.null(col_config)){
     if(any(grepl("custom_DB::",col_config$orig_name))){
       custom_DBs <- col_config[grepl("custom_DB::",orig_name)]
       custom_DBs[,orig_name := sub("custom_DB::","",orig_name)]
-      custom_DBs[,DB := gsub("__.*","",orig_name)] 
+      custom_DBs[,DB := gsub("__.*","",orig_name)]
       custom_DBs[,cols := ""]
       custom_DBs[grepl("__",orig_name),cols := paste(gsub(".*__","",orig_name),collapse = "+"),by = DB]
       custom_DBs[,input := paste(DB,cols,sep = ":")]
       custom_DBs[,input := gsub("\\:$","",input)]
-      add_custom_DB(annot_tab,unique(custom_DBs$input))
-    } 
-    
+      add_custom_DB(annot_tab,unique(custom_DBs$input),custom_DB_folder)
+    }
+
     if(any(col_config$orig_name == "exon_dist") && file.exists(gtf_file)){
       gtf <- fread(gtf_file,header = F)
       gtf <- gtf[V3 == "exon",.(chrom = V1,start = V4,end = V5,gene_name = gsub(".*gene_name .([^;]*).;.*","\\1",V9),exon = T)]
       gtf <- rbind(gtf[,.(chrom = chrom,pos = end,gene_name,exon = T)],gtf[,.(chrom = chrom,pos = start,gene_name,exon = T)])
       gtf <- unique(gtf)
-      
+
       pos_tab <- annot_tab[gene_region != "exon",.(chrom,pos,gene_name = SYMBOL,exon = F)]
       pos_tab <- unique(pos_tab)
-      
+
       exon_pos_tab <- rbind(gtf,pos_tab)
       exon_pos_tab[,pos := as.integer(pos)]
       exon_pos_tab[,any_var := sum(!exon),by = c("chrom","gene_name")]
@@ -281,24 +281,24 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
       exon_pos_tab <- exon_pos_tab[exon == F | diff != 0,]
       exon_pos_tab[,exon_dist := sapply(pos, function(x) as.numeric(min(abs(x - pos[exon == T])))),by = c("chrom","gene_name")]
       setnames(exon_pos_tab,"gene_name","SYMBOL")
-      
+
       annot_tab <- merge(annot_tab,exon_pos_tab[exon == F,.(chrom,pos,SYMBOL,exon_dist)],by = c("chrom","pos","SYMBOL"),all.x = T)
       annot_tab[is.na(exon_dist),exon_dist := 0]
       annot_tab[exon_dist == Inf,exon_dist := NA]
     }
-  } 
-  
+  }
+
   #var_gen_coord == Chr5(GRCh37):g.112176756T>A
   annot_tab[,var_gen_coord := paste0(ref_name,"____",var_name)]
   annot_tab[,var_gen_coord := gsub("^(.*)____([0-9XY]+)_([0-9]+)_([ACGT-]+)\\/([ACGT-]+)$","Chr\\2\\(\\1\\)\\:g\\.\\3\\4\\>\\5",var_gen_coord)]
-  
-  
+
+
   #correct renaming
   # final_tab[,full_trans_name := gsub("\\:c.*","",HGVSc)]
-  
-  
+
+
   return(annot_tab)
-  
+
 }
 
 run_all <- function(args){
@@ -308,14 +308,16 @@ run_all <- function(args){
   ref_name <- args[3]
   gtf_file <- args[4]
   resources_dir <- args[5]
-  format_file <- args[6]
-  
+  custom_DB_folder <- args[6]
+  format_file <- args[7]
+
+
   ref_name <- gsub("\\-.*","",ref_name)
-  
+
   col_config <- fread(format_file,skip = "orig_name")
   #load and process annotated vars
-  annot_tab <- load_and_process_annot_tab(annot_file,ref_name,col_config,resources_dir)
-  
+  annot_tab <- load_and_process_annot_tab(annot_file,ref_name,col_config,resources_dir,custom_DB_folder,gtf_file)
+
   fwrite(annot_tab,file = output_file,sep = "\t")
 }
 
@@ -331,7 +333,7 @@ run_all <- function(args){
 # args[6] <- "/home/402182/BioRoots-somaticSeq/workflows/paired_somatic_small_var_call/resources/formats/slaby_children_soma.txt"
 
 #run as Rscript
-# 
+#
 args <- commandArgs(trailingOnly = T)
 run_all(args)
 

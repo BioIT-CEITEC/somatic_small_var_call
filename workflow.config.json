@@ -2,7 +2,7 @@
   "workflow_description": {
     "name":"somatic_small_var_call",
     "version": 1.0,
-    "label":"Somatic small variant calling 03032022",
+    "label":"Somatic small variant calling",
     "type":"somatic_small_var_call",
     "inputs":[
       "mapped/{sample}.bam*"
@@ -11,7 +11,6 @@
       "final_variant_table.xlsx",
       "final_variant_table.tsv",
       "mutation_loads.xlsx",
-      "config.json",
       "annotate/*",
       "logs/*",
       "per_sample_final_var_tabs/*",
@@ -28,7 +27,6 @@
     "sample_name"
   ],
   "requested_params": [
-    "is_paired",
     "reference",
     "lib_ROI"
   ],
@@ -48,6 +46,11 @@
           "BRONCO": "BRONCO",
           "slaby_children_soma" : "Pediatric oncology project format somatic"
         }
+      },
+      "tumor_normal_paired": {
+        "label": "Samples are tumor-normal paired",
+        "type": "bool",
+        "default": true
       }
     },
     "detailed": {
@@ -71,7 +74,16 @@
       "donor": {
         "label": "Patient ID",
         "type": "string",
-        "default": ""
+        "default": "",
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
+            }
+          }
+        }
       },
       "tumor_normal": {
         "label": "Tumor/normal",
@@ -80,6 +92,15 @@
         "list": {
           "tumor": "tumor",
           "normal": "normal"
+        },
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
+            }
+          }
         }
       }
     }
