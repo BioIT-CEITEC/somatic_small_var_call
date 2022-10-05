@@ -75,8 +75,15 @@ include: "rules/variant_postprocessing.smk"
 
 ####################################
 # RULE ALL
+somatic_only = list()
+
+if config["tumor_normal_paired"]:
+    somatic_only.append("somatic_only_final_variant_table.xlsx")
+
+
 rule all:
-    input:  
+    input:
+        somatic_only,
         all_vars_xlsx = "final_variant_table.xlsx",
         all_vars_tsv = "final_variant_table.tsv",
         per_sample_var_tabs = expand("per_sample_final_var_tabs/{sample_name}.variants.xlsx", sample_name = sample_tab.sample_name)
