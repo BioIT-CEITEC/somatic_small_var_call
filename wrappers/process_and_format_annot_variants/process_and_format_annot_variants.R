@@ -46,7 +46,8 @@ run_all <- function(args){
   format_file <- args[5]
   VF_threshold <- as.numeric(args[6]) / 100
   reference_directory <- args[7]
-  var_files <- args[8:length(args)]
+  organism <- args[8]
+  var_files <- args[9:length(args)]
 
   
   #load format config file
@@ -67,7 +68,7 @@ run_all <- function(args){
   
   final_unformated_tab <- merge(all_var_tab,annot_tab,by = "var_name",allow.cartesian=TRUE)
   
-  if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO")){
+  if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO") && organism == "homo_sapiens"){
     compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs,reference_directory)
   } else {
     system(paste0("touch ",mut_load_output_file))
