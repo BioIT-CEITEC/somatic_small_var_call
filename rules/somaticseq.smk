@@ -84,3 +84,11 @@ rule postprocess_somaticseq_variants:
         tumor_normal_paired=config["tumor_normal_paired"]
     conda:  "../wrappers/postprocess_somaticseq_variants/env.yaml"
     script: "../wrappers/postprocess_somaticseq_variants/script.py"
+
+rule copy_somaticseq_into_merged:
+    input:
+        "somatic_seq_results/{sample_name}.variants.tsv"
+    output:
+        "merged/{sample_name}.processed.tsv"
+    shell:
+        "cp {input} {output}"
