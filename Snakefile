@@ -25,22 +25,30 @@ else:
 ##### Reference processing
 #
 config["material"] = "DNA"
-if config["lib_ROI"] != "wgs" or config["lib_ROI"] != "RNA":
-    # setting reference from lib_ROI
-    f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
-    lib_ROI_dict = json.load(f)
-    f.close()
-    config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
-else:
-    if config["lib_ROI"] != "RNA":
-        config["material"] = "RNA" # ??? nemelo by DNA
-        config["lib_ROI"] = "wgs"
+# if config["lib_ROI"] != "wgs" or config["lib_ROI"] != "RNA":
+#     # setting reference from lib_ROI
+#     f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","lib_ROI.json"))
+#     lib_ROI_dict = json.load(f)
+#     f.close()
+#     config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
+# else:
+#     if config["lib_ROI"] != "RNA":
+#         config["material"] = "RNA" # ??? nemelo by DNA
+#         config["lib_ROI"] = "wgs"
 
 #### Setting organism from reference
-f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference.json"),)
-reference_dict = json.load(f)
-f.close()
-config["organism"] = [organism_name.lower().replace(" ","_") for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].keys()][0]
+# f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference2.json"),)
+# reference_dict = json.load(f)
+# f.close()
+#
+# config["species_name"] = [organism_name for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].keys()][0]
+# config["organism"] = config["species_name"].split(" (")[0].lower().replace(" ","_")
+# if len(config["species_name"].split(" (")) > 1:
+#     config["species"] = config["species_name"].split(" (")[1].replace(")","")
+config["reference"] = "NFZv2.0"
+config["organism"] = "nothobranchius_furzeri"
+config["lib_ROI"] = "wgs"
+
 
 #### SPLIT CALLERS STRING
 callers = config["callers"].split(';')
