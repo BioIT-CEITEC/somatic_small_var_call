@@ -89,6 +89,6 @@ rule copy_somaticseq_into_merged:
     input:
         "somatic_seq_results/{sample_name}.variants.tsv"
     output:
-        "merged/{sample_name}.processed.tsv"
+        "merged/{sample_name}.variants.tsv"
     shell:
         "cp {input} {output}"
