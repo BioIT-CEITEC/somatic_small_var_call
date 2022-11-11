@@ -84,7 +84,9 @@ include: "rules/variant_postprocessing.smk"
 ####################################
 # RULE ALL
 rule all:
-    input:  
+    # input:
+    #     expand("variant_calls/{sample_name}/somaticsniper/SomaticSniper.vcf", sample_name = sample_tab.sample_name)
+    input:
         all_vars_xlsx = "final_variant_table.xlsx",
         all_vars_tsv = "final_variant_table.tsv",
         per_sample_var_tabs = expand("per_sample_final_var_tabs/{sample_name}.variants.xlsx", sample_name = sample_tab.sample_name)

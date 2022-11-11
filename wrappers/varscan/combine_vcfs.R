@@ -15,19 +15,16 @@ run_all <- function(args){
   tab1 <- fread(vcf1_file,skip = "#CHROM")
   setnames(tab1,"#CHROM","CHROM")
   tab1[,CHROM := as.character(CHROM)]
-  tab1[,line := rvcf1]
   
   tab2 <- fread(vcf2_file,skip = "#CHROM")
   setnames(tab2,"#CHROM","CHROM")
   tab2[,CHROM := as.character(CHROM)]
-  tab2[,line := rvcf2]
   
   tab <- rbind(tab1,tab2)
   setkey(tab)
-  
-  res_vcf <- c(header,tab$line)
-  cat(paste(paste0(res_vcf,"\n"),collapse = ""),file = out_file)
-  
+
+  write(header,file = out_file)
+  fwrite(tab,file = out_file, append = TRUE, sep = "\t")
 }
 
 # develop and test 2

@@ -38,8 +38,7 @@ rule somaticsniper:
         vcf = "variant_calls/{sample_name}/somaticsniper/SomaticSniper.vcf"
     log: "logs/{sample_name}/callers/somaticsniper.log"
     threads: 1
-    resources:
-        mem_mb=6000
+    resources: mem=50
     params: prefix = "variant_calls/{sample_name}/somaticsniper/"
     conda:  "../wrappers/somaticsniper/env.yaml"
     script: "../wrappers/somaticsniper/script.py"
@@ -124,8 +123,7 @@ rule mutect2:
         vcf = "variant_calls/{sample_name}/mutect2/MuTect2.vcf"
     log: "logs/{sample_name}/callers/mutect2.log"
     threads: 5
-    resources:
-        mem_mb=6000
+    resources: mem = 30
     params: sample_orig_bam_names = sample_orig_bam_names,
             bamout = "variant_calls/{sample_name}/mutect2/realigned.bam",
             calling_type = config["tumor_normal_paired"]

@@ -24,6 +24,7 @@ command = "bam-somaticsniper " + \
             " " + snakemake.input.tumor + \
             " " + snakemake.input.normal + \
             " " + snakemake.output.vcf +\
+            " --java-options \"-Xmx"+str(snakemake.resources.mem)+"g"+\
             " >> " + log_filename + " 2>&1"
 
 f = open(log_filename, 'at')

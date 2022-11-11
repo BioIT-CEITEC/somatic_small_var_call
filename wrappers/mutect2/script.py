@@ -38,7 +38,7 @@ shell(command)
 non_filtered_vcf = snakemake.output.vcf.replace(".vcf",".not_filtered.vcf")
 
 if snakemake.params.calling_type:
-    command = "gatk --java-options \"-Xmx30g \" Mutect2" + \
+    command = "gatk --java-options \"-Xmx"+str(snakemake.resources.mem)+"g \" Mutect2" + \
               " -R " + snakemake.input.ref + \
               " -I " + snakemake.input.tumor + \
               " -I " + snakemake.input.normal + \
@@ -50,7 +50,7 @@ if snakemake.params.calling_type:
               " -bamout " + snakemake.params.bamout + \
               " >> " + log_filename + " 2>&1"
 else:
-    command = "gatk --java-options \"-Xmx30g \" Mutect2" + \
+    command = "gatk --java-options \"-Xmx"+str(snakemake.resources.mem)+"g \" Mutect2" + \
               " -R " + snakemake.input.ref + \
               " -I " + snakemake.input.tumor + \
               " -tumor " + str(snakemake.params.sample_orig_bam_names["tumor"]) + \
@@ -68,7 +68,7 @@ f.close()
 
 shell(command)
 
-command = "gatk --java-options \"-Xmx30g\" FilterMutectCalls" + \
+command = "gatk --java-options \"-Xmx"+str(snakemake.resources.mem)+"g\" FilterMutectCalls" + \
                " -R "+ snakemake.input.ref +\
                " -V "+ non_filtered_vcf +\
                " -O " + snakemake.output.vcf +\
