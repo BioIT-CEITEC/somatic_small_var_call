@@ -54,7 +54,7 @@ rule somaticseq:
         caller_output = individual_caller_outputs,
         ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference"])[0],
         regions =  expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir = reference_directory,library_scope = config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0]
+        # dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0]
     output:
         snv="somatic_seq_results/{sample_name}/Consensus.sSNV.vcf",
         indel="somatic_seq_results/{sample_name}/Consensus.sINDEL.vcf"
