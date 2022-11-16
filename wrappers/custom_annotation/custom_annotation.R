@@ -139,7 +139,7 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   annot_tab <- fread(annot_file,sep = "\t",header = T,skip = "#Uploaded_variation",verbose = F,showProgress = F)
   setnames(annot_tab,"#Uploaded_variation","var_name")
 
-  annot_tab[,group:=seq_along(Location)%/%100]
+  annot_tab[,group:=seq_along(Location)%/%1000000]
 
   annot_tab_list <- lapply(unique(annot_tab$group),function(x){
                       annot_tab_parse(annot_tab[group == x,])})
