@@ -47,6 +47,7 @@ run_all <- function(args){
   VF_threshold <- as.numeric(args[6]) / 100
   reference <- args[7]
   var_files <- args[8:length(args)]
+  organism <- args[9]
 
 
   
@@ -118,8 +119,8 @@ compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_
     filter_text <- trimws(mut_load_config[index,]$V3)
     filtered_var_table <- eval(parse(text = paste0("variant_tab[",filter_text,"]")))
 
-    # add reference path /mnt/references/homsap/GRCh37-p13
-    mut_definitions <- paste0("/mnt/references/homsap/",reference,"/")
+    # add reference path
+    mut_definitions <- paste0("/mnt/references/",organism,"/",reference,"/")
     intervals <- fread(paste0(mut_definitions,mut_load_config[index,]$V2))
 
     intervals[,is_in := "x"]

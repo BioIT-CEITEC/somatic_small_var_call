@@ -16,6 +16,7 @@ rule process_and_format_annot_variants:
     resources:
         mem_mb=8000
     params: reference = config["reference"],
+            organism= config["organism"],
             min_variant_frequency = str(config["min_variant_frequency"]),
             format = config["format"],
             anno_gtf = expand("{ref_dir}/annot/{ref_name}.gtf",ref_dir = reference_directory,ref_name = config["reference"])
