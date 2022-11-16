@@ -113,13 +113,7 @@ add_custom_DB <- function(tab,custom_DBs,custom_DB_folder){
   }
 }
 
-
-load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,resources_dir,custom_DB_folder,gtf_file){
-
-  #READ ANNOTATION TABLE
-  annot_tab <- fread(annot_file,sep = "\t",header = T,skip = "#Uploaded_variation",verbose = F,showProgress = F)
-  setnames(annot_tab,"#Uploaded_variation","var_name")
-
+annot_tab_parse <- function(annot_tab){
   annot_tab_extra_parse <- annot_tab$Extra
   annot_tab_extra_parse <- strsplit(annot_tab_extra_parse,";")
   annot_tab_extra_names_order <- order(unlist(lapply(annot_tab_extra_parse,seq_along)))
@@ -130,16 +124,50 @@ load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,res
   annot_tab_extra <- data.table(index = annot_extra_index,names = annot_extra_names,value = annot_extra_value)
   annot_tab_extra <- dcast.data.table(annot_tab_extra,formula = index ~ names,fill = NA,value.var = "value")
 
-  annot_tab <- cbind(annot_tab,annot_tab_extra)
-  remove(annot_tab_extra)
   remove(annot_tab_extra_parse)
   remove(annot_extra_names)
   remove(annot_extra_value)
   remove(annot_extra_index)
   remove(annot_tab_extra_names_order)
 
+  return(annot_tab_extra)
+}
+
+load_and_process_annot_tab <- function(annot_file,ref_name,col_config = NULL,resources_dir,custom_DB_folder,gtf_file){
+
+  #READ ANNOTATION TABLE
+  annot_tab <- fread(annot_file,sep = "\t",header = T,skip = "#Uploaded_variation",verbose = F,showProgress = F)
+  setnames(annot_tab,"#Uploaded_variation","var_name")
+
+  annot_tab[,group:=seq_along(Location)%/%100]
+
+  annot_tab_list <- lapply(unique(annot_tab$group),function(x){
+                      annot_tab_parse(annot_tab[group == x,])})
+
+  annot_tab_extra_all <- rbindlist(annot_tab_list,fill=TRUE)
+  annot_tab <- cbind(annot_tab,annot_tab_extra_all)
+
+  # annot_tab_extra_parse <- annot_tab$Extra
+  # annot_tab_extra_parse <- strsplit(annot_tab_extra_parse,";")
+  # annot_tab_extra_names_order <- order(unlist(lapply(annot_tab_extra_parse,seq_along)))
+  # annot_extra_names <- unlist(lapply(annot_tab_extra_parse,function(x) gsub("(.*)=.*","\\1",x)))
+  # annot_extra_value <- unlist(lapply(annot_tab_extra_parse,function(x) gsub(".*=(.*)","\\1",x)))
+  # annot_extra_index <- sapply(annot_tab_extra_parse,length)
+  # annot_extra_index <- rep(seq_along(annot_extra_index),annot_extra_index)
+  # annot_tab_extra <- data.table(index = annot_extra_index,names = annot_extra_names,value = annot_extra_value)
+  # annot_tab_extra <- dcast.data.table(annot_tab_extra,formula = index ~ names,fill = NA,value.var = "value")
+  #
+  # annot_tab <- cbind(annot_tab,annot_tab_extra)
+  # remove(annot_tab_extra)
+  # remove(annot_tab_extra_parse)
+  # remove(annot_extra_names)
+  # remove(annot_extra_value)
+  # remove(annot_extra_index)
+  # remove(annot_tab_extra_names_order)
+
   annot_tab[,Extra := NULL]
   annot_tab[,index := NULL]
+  annot_tab[,group := NULL]
 
   annot_tab <- unique(annot_tab,by = c("var_name","Location","Allele","Gene","Feature","STRAND"))
   annot_tab <- annot_tab[,var_name := gsub("(.*/[^/]*)/.*","\\1",var_name)]
@@ -332,10 +360,10 @@ run_all <- function(args){
 # args[5] <- "/home/402182/BioRoots-somaticSeq/workflows/paired_somatic_small_var_call/resources"
 # args[6] <- "/home/402182/BioRoots-somaticSeq/workflows/paired_somatic_small_var_call/resources/formats/slaby_children_soma.txt"
 
+
 #run as Rscript
 #
 args <- commandArgs(trailingOnly = T)
 run_all(args)
-
 
 
