@@ -46,8 +46,9 @@ run_all <- function(args){
   format_file <- args[5]
   VF_threshold <- as.numeric(args[6]) / 100
   reference <- args[7]
-  var_files <- args[8:length(args)]
-  organism <- args[9]
+  organism <- args[8]
+  var_files <- args[9:length(args)]
+
 
 
   
@@ -69,11 +70,12 @@ run_all <- function(args){
   
   final_unformated_tab <- merge(all_var_tab,annot_tab,by = "var_name",allow.cartesian=TRUE)
   
-  if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO")){
-    compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs,reference)
-  } else {
-    system(paste0("touch ",mut_load_output_file))
-  }
+  # if(any(global_format_configs$V1 == "mut_load") && any(global_format_configs[V1 == "mut_load"]$V2 != "NO")){
+  #   compute_and_write_mut_load(final_unformated_tab,mut_load_output_file,global_format_configs,reference)
+  # } else {
+  #   system(paste0("touch ",mut_load_output_file))
+  # }
+  system(paste0("touch ",mut_load_output_file))
   
   #keep only cols in config which are in the final table
   col_config <- col_config[orig_name %in% names(final_unformated_tab)]
