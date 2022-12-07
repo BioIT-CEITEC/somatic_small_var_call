@@ -8,7 +8,6 @@
       "mapped/{sample}.bam*"
     ],
     "outputs":[
-      "config.json",
       "logs/*",
       "somatic_seq_results/*",
       "variant_calls/*",
@@ -25,21 +24,6 @@
   ],
   "gui_params" : {
     "primary": {
-      "callers": {
-        "label": "Somatic variant callers to use",
-        "type": "string",
-        "default": "strelka;vardict;mutect2;somaticsniper;lofreq;muse;varscan"
-      },
-      "format": {
-        "label": "Result variant table format ",
-        "type": "enum",
-        "default": "default",
-        "list": {
-          "default": "Default format",
-          "BRONCO": "BRONCO",
-          "slaby_children_soma" : "Pediatric oncology project format somatic"
-        }
-      },
       "tumor_normal_paired": {
         "label": "Samples are tumor-normal paired",
         "type": "bool",
@@ -47,6 +31,59 @@
       }
     },
     "detailed": {
+      "somatic_use_strelka": {
+        "label": "Use strelka for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_vardict": {
+        "label": "Use vardict for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_mutect2": {
+        "label": "Use mutect2 for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_lofreq": {
+        "label": "Use lofreq for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_varscan": {
+        "label": "Use varscan for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_muse": {
+        "label": "Use muse for somatic variant calling.",
+        "type": "bool",
+        "default": true,
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
+            }
+          }
+        }
+      },
+      "somatic_use_somaticsniper": {
+        "label": "Use somaticsniper for somatic variant calling.",
+        "type": "bool",
+        "default": true,
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
+            }
+          }
+        }
+      },
       "min_variant_frequency": {
         "label": "Vardict & Final Processing: Minimal variant frequency to report",
         "type": "int",
@@ -56,11 +93,6 @@
         "label": "Varscan: Extra parameters",
         "type": "string",
         "default": "--strand-filter 0 --p-value 0.95 --min-var-freq 0.05"
-      },
-      "not_use_merged": {
-        "label": "VEP: not_use_merged",
-        "type": "bool",
-        "default": false
       }
     },
     "samples": {

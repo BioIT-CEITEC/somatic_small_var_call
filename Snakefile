@@ -3,9 +3,6 @@ import pandas as pd
 
 configfile: "config.json"
 GLOBAL_REF_PATH = config["globalResources"]
-# JSON validation, only the description and parameters part, not the samples part
-# from snakemake.utils import validate
-#validate(config, "config.schema.json")
 
 
 ##### Config processing #####
@@ -31,9 +28,9 @@ if config["lib_ROI"] != "wgs" and config["lib_ROI"] != "RNA":
     f.close()
     config["reference"] = [ref_name for ref_name in lib_ROI_dict.keys() if isinstance(lib_ROI_dict[ref_name],dict) and config["lib_ROI"] in lib_ROI_dict[ref_name].keys()][0]
 else:
-    config["lib_ROI"] = "wgs"
     if config["lib_ROI"] == "RNA":
         config["material"] = "RNA"
+    config["lib_ROI"] = "wgs"
 
 #### Setting organism from reference
 f = open(os.path.join(GLOBAL_REF_PATH,"reference_info","reference2.json"),)
@@ -45,8 +42,25 @@ if len(config["species_name"].split(" (")) > 1:
     config["species"] = config["species_name"].split(" (")[1].replace(")","")
 
 
-#### SPLIT CALLERS STRING
-callers = config["callers"].split(';')
+
+# ####################################
+# # create caller list from table
+callers = []
+if config["somatic_use_strelka"]:
+    callers.append("strelka")
+if config["somatic_use_vardict"]:
+    callers.append("vardict")
+if config["somatic_use_mutect2"]:
+    callers.append("mutect2")
+if config["somatic_use_lofreq"]:
+    callers.append("lofreq")
+if config["somatic_use_varscan"]:
+    callers.append("varscan")
+if config["somatic_use_muse"]:
+    callers.append("muse")
+if config["somatic_use_somaticsniper"]:
+    callers.append("somaticsniper")
+
 
 
 #### FOLDERS
