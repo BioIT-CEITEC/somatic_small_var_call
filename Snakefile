@@ -86,4 +86,4 @@ include: "rules/somaticseq.smk"
 # RULE ALL
 rule all:
     input:  
-       merged = expand("merged/{sample_name}.variants.tsv", sample_name = sample_tab.sample_name),
+       final_variants = expand("somatic_varcalls/{sample_name}.final_variants.tsv", sample_name = sample_tab.sample_name),

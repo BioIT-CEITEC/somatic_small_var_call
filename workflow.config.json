@@ -9,9 +9,7 @@
     ],
     "outputs":[
       "logs/*",
-      "somatic_seq_results/*",
-      "variant_calls/*",
-      "merged/*"
+      "somatic_varcalls/*"
     ]
   },
   "general_params": [
