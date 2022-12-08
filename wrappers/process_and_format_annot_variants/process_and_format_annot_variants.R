@@ -108,7 +108,7 @@ filter_variants <- function(all_var_tab,VF_threshold = 0,coverage_alarm = c(1,10
 
 
 
-compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs,reference){
+compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_format_configs){
   variant_tab <- unique(variant_tab,by = c("sample","var_name"))
   mut_load_config <- as.data.table(tstrsplit(global_format_configs[V1 == "mut_load"]$V2,split = "::"))
   
@@ -118,9 +118,7 @@ compute_and_write_mut_load  <- function(variant_tab,mut_load_output_file,global_
     filter_text <- trimws(mut_load_config[index,]$V3)
     filtered_var_table <- eval(parse(text = paste0("variant_tab[",filter_text,"]")))
 
-    # add reference path /mnt/references/homsap/GRCh37-p13
-    mut_definitions <- paste0("/mnt/references/homsap/",reference,"/")
-    intervals <- fread(paste0(mut_definitions,mut_load_config[index,]$V2))
+    intervals <- fread(mut_load_config[index,]$V2)
 
     intervals[,is_in := "x"]
     
