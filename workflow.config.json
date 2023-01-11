@@ -8,6 +8,7 @@
       "mapped/{sample}.bam*"
     ],
     "outputs":[
+      "config.json",
       "logs/*",
       "somatic_varcalls/*"
     ]
