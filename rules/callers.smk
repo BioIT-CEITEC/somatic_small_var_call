@@ -11,16 +11,6 @@ def bam_inputs(wildcards):
     else:
         return {'tumor': expand("mapped/{tumor_bam}.{tag}",tumor_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name"],tag=tag)[0]}
 
-# def mpileup_bam_input(wildcards):
-#     if config["material"] != "RNA":
-#         tag = "bam"
-#     else:
-#         tag = "RNAsplit.bam"
-#     if wildcards.sample_pair == "tumor":
-#         return expand("mapped/{tumor_bam}.{tag}",tumor_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"],tag=tag)
-#     else:
-#         return expand("mapped/{normal_bam}.{tag}",normal_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_normal"],tag=tag)
-
 def sample_orig_bam_names(wildcards):
     if config["tumor_normal_paired"] == True:
         return {'tumor': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"])[0], \
@@ -232,3 +222,14 @@ rule varscan_single:
         calling_type = config["tumor_normal_paired"]
     conda: "../wrappers/varscan/env.yaml"
     script: "../wrappers/varscan/script.py"
+
+
+rule RNA_SplitNCigars:
+    input: bam = "mapped/{sample_name}.bam",
+           ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0]
+    output: bam = "mapped/{sample_name}.RNAsplit.bam",
+            bai = "mapped/{sample_name}.RNAsplit.bam.bai",
+    log:    run = "logs/{sample_name}/callers/RNA_SplitNCigars.log",
+    params: bai = "mapped/{sample_name}.RNAsplit.bai"
+    conda:  "../wrappers/RNA_SplitNCigars/env.yaml"
+    script: "../wrappers/RNA_SplitNCigars/script.py"
