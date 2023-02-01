@@ -5,6 +5,7 @@ configfile: "config.json"
 GLOBAL_REF_PATH = config["globalResources"]
 GLOBAL_TMPD_PATH = config["globalTmpdPath"]
 
+os.makedirs(GLOBAL_TMPD_PATH, exist_ok=True)
 
 ##### Config processing #####
 #conversion from new json

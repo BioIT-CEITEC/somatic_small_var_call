@@ -136,10 +136,12 @@ rule strelka_paired:
     threads: 5
     resources:
         mem_mb=6000
-    params: dir = "somatic_varcalls/{sample_name}/strelka",
+    params: dir = os.path.join(GLOBAL_TMPD_PATH,"somatic_varcalls/{sample_name}/strelka"),
             library_scope = config["lib_ROI"],
             sample_material=config["material"],
-            calling_type = config["tumor_normal_paired"]
+            calling_type = config["tumor_normal_paired"],
+            snps = os.path.join(GLOBAL_TMPD_PATH,"somatic_varcalls/{sample_name}/strelka/results/variants/somatic.snvs.vcf.gz"),
+            indels = os.path.join(GLOBAL_TMPD_PATH,"somatic_varcalls/{sample_name}/strelka/results/variants/somatic.indels.vcf.gz")
     conda:  "../wrappers/strelka/env.yaml"
     script: "../wrappers/strelka/script.py"
 
@@ -155,10 +157,11 @@ rule strelka_single:
     threads: 5
     resources:
         mem_mb=6000
-    params: dir = "somatic_varcalls/{sample_name}/strelka",
+    params: dir = os.path.join(GLOBAL_TMPD_PATH,"somatic_varcalls/{sample_name}/strelka"),
             library_scope = config["lib_ROI"],
             sample_material=config["material"],
-            calling_type = config["tumor_normal_paired"]
+            calling_type = config["tumor_normal_paired"],
+            vcf = os.path.join(GLOBAL_TMPD_PATH,"somatic_varcalls/{sample_name}/strelka/results/variants/variants.vcf.gz"),
     conda:  "../wrappers/strelka/env.yaml"
     script: "../wrappers/strelka/script.py"
 

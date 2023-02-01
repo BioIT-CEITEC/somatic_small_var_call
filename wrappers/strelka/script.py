@@ -58,10 +58,31 @@ f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
-# remove workspace - lots of files messing copying speeds
-shell("rm -fR " + snakemake.params.dir + "/workspace")
+# # remove workspace - lots of files messing copying speeds
+# shell("rm -fR " + snakemake.params.dir + "/workspace")
+if snakemake.params.calling_type:
 
+    command = "cp " + snakemake.params.snps + " " + snakemake.output.snps
 
+    f = open(log_filename, 'a+')
+    f.write("## COMMAND: "+command+"\n")
+    f.close()
+    shell(command)
+
+    command = "cp " + snakemake.params.indels + " " + snakemake.output.indels
+
+    f = open(log_filename, 'a+')
+    f.write("## COMMAND: "+command+"\n")
+    f.close()
+    shell(command)
+
+else:
+    command = "cp " + snakemake.params.vcf + " " + snakemake.output.vcf
+
+    f = open(log_filename, 'a+')
+    f.write("## COMMAND: "+command+"\n")
+    f.close()
+    shell(command)
 
 
 
