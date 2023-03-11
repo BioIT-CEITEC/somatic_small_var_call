@@ -4,6 +4,10 @@
     "version": 1.2,
     "label":"Somatic small variant calling",
     "type":"somatic_small_var_call",
+    "run_parameters": {
+      "cpu": 32,
+      "memory": 124
+    },
     "inputs":[
       "mapped/{sample}.bam*"
     ],
