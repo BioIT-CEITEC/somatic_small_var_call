@@ -81,11 +81,13 @@ wildcard_constraints:
 
 ####################################
 # SEPARATE RULES
-include: "rules/callers.smk"
-include: "rules/somaticseq.smk"
+# include: "rules/callers.smk"
+# include: "rules/somaticseq.smk"
+include: "rules/variant_merging.smk"
 
 ####################################
 # RULE ALL
 rule all:
-    input:  
-       final_variants = expand("somatic_varcalls/{sample_name}.final_variants.tsv", sample_name = sample_tab.sample_name),
+    input:
+        final_variants = expand("somatic_varcalls/{sample_name}.final_variants.tsv",sample_name=sample_tab.sample_name)
+
