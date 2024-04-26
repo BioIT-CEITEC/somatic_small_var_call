@@ -22,8 +22,8 @@ def sample_orig_bam_names(wildcards):
 rule somaticsniper:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        regions= config["organism_dna_panel"],
     output:
         vcf = "somatic_varcalls/{sample_name}/somaticsniper/SomaticSniper.vcf"
     log: "logs/{sample_name}/callers/somaticsniper.log"
@@ -37,9 +37,9 @@ rule somaticsniper:
 rule lofreq_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = config["organism_fasta"],
+        regions= config["organism_dna_panel"],
+        dbsnp = config["dbsnp"],
     output:
         snps="somatic_varcalls/{sample_name}/lofreq/somatic_final.snvs.vcf.gz",
         indels="somatic_varcalls/{sample_name}/lofreq/somatic_final.indels.vcf.gz"
@@ -55,9 +55,9 @@ rule lofreq_paired:
 rule lofreq_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = config["organism_fasta"],
+        regions= config["organism_dna_panel"],
+        dbsnp = config["dbsnp"],
     output:
         vcf="somatic_varcalls/{sample_name}/lofreq/Lofreq.vcf"
     log: "logs/{sample_name}/callers/lofreq.log"
@@ -72,9 +72,9 @@ rule lofreq_single:
 rule muse:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = config["organism_fasta"],
+        regions = config["organism_dna_panel"],
+        dbsnp = config["dbsnp"],
     output:
         vcf = "somatic_varcalls/{sample_name}/muse/MuSE.vcf"
     log: "logs/{sample_name}/callers/muse.log"
@@ -90,9 +90,9 @@ rule muse:
 rule scalpel:
     input:
         unpack(bam_inputs),
-        ref=expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference"])[0],
-        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir = reference_directory,ref_name = config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        refdict = config["organism_dict"],
+        regions = config["organism_dna_panel"],
     output:
         vcf = "somatic_varcalls/{sample_name}/scalpel/Scalpel.vcf"
     log: "logs/{sample_name}/callers/scalpel.log"
@@ -108,8 +108,8 @@ rule scalpel:
 rule mutect2:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        regions = config["organism_dna_panel"],
     output:
         vcf = "somatic_varcalls/{sample_name}/mutect2/MuTect2.vcf"
     log: "logs/{sample_name}/callers/mutect2.log"
@@ -126,9 +126,9 @@ rule mutect2:
 rule strelka_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions_gz=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        regions_tbi=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        regions_gz = config["organism_dna_panel"] + ".gz",
+        regions_tbi = config["organism_dna_panel"] + ".gz.tbi",
     output:
         snps="somatic_varcalls/{sample_name}/strelka/results/variants/somatic.snvs.vcf.gz",
         indels="somatic_varcalls/{sample_name}/strelka/results/variants/somatic.indels.vcf.gz"
@@ -148,9 +148,9 @@ rule strelka_paired:
 rule strelka_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions_gz=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        regions_tbi=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        regions_gz = config["organism_dna_panel"] + ".gz",
+        regions_tbi = congig["organism_dna_panel"] + ".gz.tbi",
     output:
         vcf="somatic_varcalls/{sample_name}/strelka/results/variants/variants.vcf.gz"
     log: "logs/{sample_name}/callers/strelka.log"
@@ -168,9 +168,9 @@ rule strelka_single:
 rule vardict:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        refdict = config["organism_dict"],
+        regions = config["organism_dna_panel"],
     output:
         vcf = "somatic_varcalls/{sample_name}/vardict/VarDict.vcf"
     log: "logs/{sample_name}/callers/vardict.log"
@@ -187,8 +187,8 @@ rule vardict:
 rule varscan_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        regions = config["organism_dna_panel"],
     output:
         snp="somatic_varcalls/{sample_name}/varscan/VarScan2.snp.vcf",
         indel="somatic_varcalls/{sample_name}/varscan/VarScan2.indel.vcf"
@@ -207,8 +207,8 @@ rule varscan_paired:
 rule varscan_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"],
+        regions = config["organism_dna_panel"],
     output:
         vcf="somatic_varcalls/{sample_name}/varscan/VarScan2.vcf",
     log: "logs/{sample_name}/callers/varscan.log"
@@ -229,7 +229,7 @@ rule varscan_single:
 
 rule RNA_SplitNCigars:
     input: bam = "mapped/{sample_name}.bam",
-           ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0]
+           ref = config["organism_fasta"]
     output: bam = "mapped/{sample_name}.RNAsplit.bam",
             bai = "mapped/{sample_name}.RNAsplit.bam.bai",
     log:    run = "logs/{sample_name}/callers/RNA_SplitNCigars.log",
