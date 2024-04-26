@@ -39,7 +39,7 @@ rule lofreq_paired:
         unpack(bam_inputs),
         ref = config["organism_fasta"],
         regions= config["organism_dna_panel"],
-        dbsnp = config["dbsnp"],
+        dbsnp = config["organism_dbsnp"],
     output:
         snps="somatic_varcalls/{sample_name}/lofreq/somatic_final.snvs.vcf.gz",
         indels="somatic_varcalls/{sample_name}/lofreq/somatic_final.indels.vcf.gz"
@@ -57,7 +57,7 @@ rule lofreq_single:
         unpack(bam_inputs),
         ref = config["organism_fasta"],
         regions= config["organism_dna_panel"],
-        dbsnp = config["dbsnp"],
+        dbsnp = config["organism_dbsnp"],
     output:
         vcf="somatic_varcalls/{sample_name}/lofreq/Lofreq.vcf"
     log: "logs/{sample_name}/callers/lofreq.log"
@@ -74,7 +74,7 @@ rule muse:
         unpack(bam_inputs),
         ref = config["organism_fasta"],
         regions = config["organism_dna_panel"],
-        dbsnp = config["dbsnp"],
+        dbsnp = config["organism_dbsnp"],
     output:
         vcf = "somatic_varcalls/{sample_name}/muse/MuSE.vcf"
     log: "logs/{sample_name}/callers/muse.log"

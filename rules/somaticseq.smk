@@ -54,7 +54,7 @@ rule somaticseq:
         caller_output = individual_caller_outputs,
         ref = config["organism_fasta"],
         regions =  config["organism_dna_panel"],
-        dbsnp = config["dbsnp"]
+        dbsnp = config["organism_dbsnp"]
     output:
         snv="somatic_varcalls/{sample_name}/Consensus.sSNV.vcf",
         indel="somatic_varcalls/{sample_name}/Consensus.sINDEL.vcf"
