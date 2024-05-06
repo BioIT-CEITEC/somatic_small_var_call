@@ -150,7 +150,7 @@ rule strelka_single:
         unpack(bam_inputs),
         ref = config["organism_fasta"],
         regions_gz = config["organism_dna_panel"] + ".gz",
-        regions_tbi = congig["organism_dna_panel"] + ".gz.tbi",
+        regions_tbi = config["organism_dna_panel"] + ".gz.tbi",
     output:
         vcf="somatic_varcalls/{sample_name}/strelka/results/variants/variants.vcf.gz"
     log: "logs/{sample_name}/callers/strelka.log"
