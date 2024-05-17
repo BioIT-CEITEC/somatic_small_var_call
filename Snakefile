@@ -76,4 +76,11 @@ include: "rules/somaticseq.smk"
 # RULE ALL
 rule all:
     input:  
-       final_variants = expand("somatic_varcalls/{sample_name}.final_variants.tsv", sample_name = sample_tab.sample_name),
+       final_variants = expand("somatic_varcalls/{sample_name}.final_variants.tsv", sample_name = sample_tab.sample_name)
+
+##### BioRoot utilities - prepare reference #####
+module PR:
+    snakefile: gitlab("bioroots/bioroots_utilities", path="prepare_reference.smk",branch="master")
+    config: config
+
+use rule * from PR as other_*
