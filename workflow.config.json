@@ -1,7 +1,7 @@
 {
   "workflow_description": {
     "name":"somatic_small_var_call",
-    "version": 1.2,
+    "version": 2.0,
     "label":"Somatic small variant calling",
     "type":"somatic_small_var_call",
     "run_parameters": {
