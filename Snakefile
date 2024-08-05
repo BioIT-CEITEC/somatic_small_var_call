@@ -33,7 +33,7 @@ else:
 ##### Reference processing
 #
 
-config = BR.load_organism()
+# config = BR.load_organism()
 
 if "material" not in config:
     config["material"] = "DNA"
