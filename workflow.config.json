@@ -35,7 +35,7 @@
       },
       "calling_type": {
         "type": "constant",
-        "default": "germline"
+        "default": "somatic"
       },
       "format": {
         "label": "Result variant table format",
