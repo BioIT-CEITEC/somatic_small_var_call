@@ -32,6 +32,22 @@
         "label": "Samples are tumor-normal paired",
         "type": "bool",
         "default": true
+      },
+      "calling_type": {
+        "type": "constant",
+        "default": "germline"
+      },
+      "format": {
+        "label": "Result variant table format",
+        "type": "enum",
+        "dynamicEnumName": "small_var_format",
+        "filters": {
+          "group": {
+            "param": "calling_type",
+            "type": "value",
+            "showGroupLabel": false
+          }
+        }
       }
     },
     "detailed": {
