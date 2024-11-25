@@ -1,154 +1,137 @@
 {
-    "workflow_description": {
-      "name":"somatic_small_var_call",
-      "version": 2.0,
-      "label":"Somatic small variant calling",
-      "type":"somatic_small_var_call",
-      "run_parameters": {
-        "cpu": 32,
-        "memory": 124
-      },
-      "inputs":[
-        "mapped/{sample}.bam*"
-      ],
-      "outputs":[
-        "config.json",
-        "logs/*",
-        "somatic_varcalls/*"
-      ]
+  "workflow_description": {
+    "name":"somatic_small_var_call",
+    "version": 2.0,
+    "label":"Somatic small variant calling",
+    "type":"somatic_small_var_call",
+    "run_parameters": {
+      "cpu": 32,
+      "memory": 124
     },
-    "general_params": [
-      "entity_name",
-      "sample_name"
+    "inputs":[
+      "mapped/{sample}.bam*"
     ],
-    "requested_params": [
-      "organism",
-      "assembly",
-      "lib_ROI"
-    ],
-    "gui_params" : {
-      "primary": {
-        "tumor_normal_paired": {
-          "label": "Samples are tumor-normal paired",
-          "type": "bool",
-          "default": true
-        },
-        "calling_type": {
-          "type": "constant",
-          "default": "germline"
-        },
-        "format": {
-          "label": "Result variant table format",
-          "type": "enum",
-          "dynamicEnumName": "small_var_format",
-          "filters": {
-            "group": {
-              "param": "calling_type",
-              "type": "value",
-              "showGroupLabel": false
-             }
-           }
-         }
+    "outputs":[
+      "config.json",
+      "logs/*",
+      "somatic_varcalls/*"
+    ]
+  },
+  "general_params": [
+    "entity_name",
+    "sample_name"
+  ],
+  "requested_params": [
+    "organism",
+    "assembly",
+    "lib_ROI"
+  ],
+  "gui_params" : {
+    "primary": {
+      "tumor_normal_paired": {
+        "label": "Samples are tumor-normal paired",
+        "type": "bool",
+        "default": true
+      }
+    },
+    "detailed": {
+      "somatic_use_strelka": {
+        "label": "Use strelka for somatic variant calling.",
+        "type": "bool",
+        "default": true
       },
-      "detailed": {
-        "somatic_use_strelka": {
-          "label": "Use strelka for somatic variant calling.",
-          "type": "bool",
-          "default": true
-        },
-        "somatic_use_vardict": {
-          "label": "Use vardict for somatic variant calling.",
-          "type": "bool",
-          "default": true
-        },
-        "somatic_use_mutect2": {
-          "label": "Use mutect2 for somatic variant calling.",
-          "type": "bool",
-          "default": true
-        },
-        "somatic_use_lofreq": {
-          "label": "Use lofreq for somatic variant calling.",
-          "type": "bool",
-          "default": true
-        },
-        "somatic_use_varscan": {
-          "label": "Use varscan for somatic variant calling.",
-          "type": "bool",
-          "default": true
-        },
-        "somatic_use_muse": {
-          "label": "Use muse for somatic variant calling.",
-          "type": "bool",
-          "default": true,
-          "conditions": {
-            "relevance": {
-              "operand": "equal",
-              "negation": false,
-              "values": {
-                "tumor_normal_paired": true
-              }
+      "somatic_use_vardict": {
+        "label": "Use vardict for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_mutect2": {
+        "label": "Use mutect2 for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_lofreq": {
+        "label": "Use lofreq for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_varscan": {
+        "label": "Use varscan for somatic variant calling.",
+        "type": "bool",
+        "default": true
+      },
+      "somatic_use_muse": {
+        "label": "Use muse for somatic variant calling.",
+        "type": "bool",
+        "default": true,
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
             }
           }
-        },
-        "somatic_use_somaticsniper": {
-          "label": "Use somaticsniper for somatic variant calling.",
-          "type": "bool",
-          "default": true,
-          "conditions": {
-            "relevance": {
-              "operand": "equal",
-              "negation": false,
-              "values": {
-                "tumor_normal_paired": true
-              }
-            }
-          }
-        },
-        "min_variant_frequency": {
-          "label": "Vardict & Final Processing: Minimal variant frequency to report",
-          "type": "int",
-          "default": 0
-        },
-        "varscan_extra_params": {
-          "label": "Varscan: Extra parameters",
-          "type": "string",
-          "default": "--strand-filter 0 --p-value 0.95 --min-var-freq 0.05"
         }
       },
-      "samples": {
-        "donor": {
-          "label": "Patient ID",
-          "type": "string",
-          "default": "",
-          "conditions": {
-            "relevance": {
-              "operand": "equal",
-              "negation": false,
-              "values": {
-                "tumor_normal_paired": true
-              }
+      "somatic_use_somaticsniper": {
+        "label": "Use somaticsniper for somatic variant calling.",
+        "type": "bool",
+        "default": true,
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
             }
           }
+        }
+      },
+      "min_variant_frequency": {
+        "label": "Vardict & Final Processing: Minimal variant frequency to report",
+        "type": "int",
+        "default": 0
+      },
+      "varscan_extra_params": {
+        "label": "Varscan: Extra parameters",
+        "type": "string",
+        "default": "--strand-filter 0 --p-value 0.95 --min-var-freq 0.05"
+      }
+    },
+    "samples": {
+      "donor": {
+        "label": "Patient ID",
+        "type": "string",
+        "default": "",
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
+            }
+          }
+        }
+      },
+      "tumor_normal": {
+        "label": "Tumor/normal",
+        "type": "enum",
+        "default": "normal",
+        "list": {
+          "tumor": "tumor",
+          "normal": "normal"
         },
-        "tumor_normal": {
-          "label": "Tumor/normal",
-          "type": "enum",
-          "default": "normal",
-          "list": {
-            "tumor": "tumor",
-            "normal": "normal"
-          },
-          "conditions": {
-            "relevance": {
-              "operand": "equal",
-              "negation": false,
-              "values": {
-                "tumor_normal_paired": true
-              }
+        "conditions": {
+          "relevance": {
+            "operand": "equal",
+            "negation": false,
+            "values": {
+              "tumor_normal_paired": true
             }
           }
         }
       }
     }
   }
-
+}
