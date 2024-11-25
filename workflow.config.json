@@ -46,8 +46,9 @@
               "param": "calling_type",
               "type": "value",
               "showGroupLabel": false
-              }
-          }
+             }
+           }
+         }
       },
       "detailed": {
         "somatic_use_strelka": {
@@ -150,5 +151,4 @@
       }
     }
   }
-}
 
