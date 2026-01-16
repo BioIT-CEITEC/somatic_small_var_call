@@ -70,7 +70,7 @@ For RNA samples (`lib_ROI: rna` in the config), the workflow automatically   gen
 ## Output
 ### Main outputs
 - `somatic_varcalls/*`  
-  Directory containing the final results of somatic variant calling for each sample, including individual variant caller outputs (some with division of sSNP and sINDEL into separate files) and consensus vcf files.  
+  Directory containing the final results of somatic variant calling for each sample, including individual variant caller outputs (some with division of sSNP and sINDEL into separate files) and consensus tsv files.  
 
 ### Additional outputs
 
