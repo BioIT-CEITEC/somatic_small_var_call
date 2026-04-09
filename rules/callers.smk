@@ -1,4 +1,3 @@
-
 def bam_inputs(wildcards):
     if config["material"] != "RNA":
         tag = "bam"
@@ -6,24 +5,30 @@ def bam_inputs(wildcards):
         tag = "RNAsplit.bam"
 
     if config["tumor_normal_paired"] == True:
-        return {'tumor': expand("mapped/{tumor_bam}.{tag}",tumor_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"],tag=tag)[0], \
-                'normal': expand("mapped/{normal_bam}.{tag}",normal_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_normal"],tag=tag)[0]}
+        tumor_bam = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"].values[0]
+        normal_bam = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_normal"].values[0]
+        return {'tumor': f"mapped/{tumor_bam}.{tag}",
+                'normal': f"mapped/{normal_bam}.{tag}"}
     else:
-        return {'tumor': expand("mapped/{tumor_bam}.{tag}",tumor_bam=sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name"],tag=tag)[0]}
+        tumor_bam = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name"].values[0]
+        return {'tumor': f"mapped/{tumor_bam}.{tag}"}
 
 def sample_orig_bam_names(wildcards):
     if config["tumor_normal_paired"] == True:
-        return {'tumor': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"])[0], \
-                'normal': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_normal"])[0]}
+        tumor_name = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_tumor"].values[0]
+        normal_name = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name_normal"].values[0]
+        return {'tumor': tumor_name,
+                'normal': normal_name}
     else:
-        return {'tumor': expand("{val}",val = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name"])[0]}
+        tumor_name = sample_tab.loc[sample_tab.sample_name == wildcards.sample_name, "sample_name"].values[0]
+        return {'tumor': tumor_name}
 
 
 rule somaticsniper:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         vcf = "somatic_varcalls/{sample_name}/somaticsniper/SomaticSniper.vcf"
     log: "logs/{sample_name}/callers/somaticsniper.log"
@@ -37,9 +42,9 @@ rule somaticsniper:
 rule lofreq_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        dbsnp = expand("{ref_dir}/others/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
     output:
         snps="somatic_varcalls/{sample_name}/lofreq/somatic_final.snvs.vcf.gz",
         indels="somatic_varcalls/{sample_name}/lofreq/somatic_final.indels.vcf.gz"
@@ -55,9 +60,9 @@ rule lofreq_paired:
 rule lofreq_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        dbsnp = expand("{ref_dir}/others/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
     output:
         vcf="somatic_varcalls/{sample_name}/lofreq/Lofreq.vcf"
     log: "logs/{sample_name}/callers/lofreq.log"
@@ -72,9 +77,9 @@ rule lofreq_single:
 rule muse:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/annot/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        dbsnp = expand("{ref_dir}/others/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
     output:
         vcf = "somatic_varcalls/{sample_name}/muse/MuSE.vcf"
     log: "logs/{sample_name}/callers/muse.log"
@@ -90,9 +95,9 @@ rule muse:
 rule scalpel:
     input:
         unpack(bam_inputs),
-        ref=expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference"])[0],
-        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir = reference_directory,ref_name = config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref=expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference_dirname"])[0],
+        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir = reference_directory,ref_name = config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         vcf = "somatic_varcalls/{sample_name}/scalpel/Scalpel.vcf"
     log: "logs/{sample_name}/callers/scalpel.log"
@@ -108,8 +113,8 @@ rule scalpel:
 rule mutect2:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         vcf = "somatic_varcalls/{sample_name}/mutect2/MuTect2.vcf"
     log: "logs/{sample_name}/callers/mutect2.log"
@@ -126,9 +131,9 @@ rule mutect2:
 rule strelka_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions_gz=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        regions_tbi=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions_gz=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        regions_tbi=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         snps="somatic_varcalls/{sample_name}/strelka/results/variants/somatic.snvs.vcf.gz",
         indels="somatic_varcalls/{sample_name}/strelka/results/variants/somatic.indels.vcf.gz"
@@ -148,9 +153,9 @@ rule strelka_paired:
 rule strelka_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions_gz=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        regions_tbi=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions_gz=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        regions_tbi=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         vcf="somatic_varcalls/{sample_name}/strelka/results/variants/variants.vcf.gz"
     log: "logs/{sample_name}/callers/strelka.log"
@@ -168,9 +173,9 @@ rule strelka_single:
 rule vardict:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         vcf = "somatic_varcalls/{sample_name}/vardict/VarDict.vcf"
     log: "logs/{sample_name}/callers/vardict.log"
@@ -187,8 +192,8 @@ rule vardict:
 rule varscan_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         snp="somatic_varcalls/{sample_name}/varscan/VarScan2.snp.vcf",
         indel="somatic_varcalls/{sample_name}/varscan/VarScan2.indel.vcf"
@@ -207,8 +212,8 @@ rule varscan_paired:
 rule varscan_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0],
-        regions=expand("{ref_dir}/intervals/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
+        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
     output:
         vcf="somatic_varcalls/{sample_name}/varscan/VarScan2.vcf",
     log: "logs/{sample_name}/callers/varscan.log"
@@ -229,7 +234,7 @@ rule varscan_single:
 
 rule RNA_SplitNCigars:
     input: bam = "mapped/{sample_name}.bam",
-           ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference"])[0]
+           ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0]
     output: bam = "mapped/{sample_name}.RNAsplit.bam",
             bai = "mapped/{sample_name}.RNAsplit.bam.bai",
     log:    run = "logs/{sample_name}/callers/RNA_SplitNCigars.log",
