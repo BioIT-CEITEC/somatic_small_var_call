@@ -10,48 +10,54 @@ This repository provides a Snakemake-based workflow for somatic small variant ca
 
 All remaining dependencies are handled by Snakemake using Conda environments defined per rule and they differ based on the selection of specific parameters and used tools.
 ## Parameters
-### Required parameters
-The workflow uses a local *config.json* file, the required parameters need to be specified in it. This workflow is primarily designed so that the configuration is generated and managed via an internal GUI.
+**Note:** This workflow is primarily designed to be configured via an internal GUI. Most parameters have sensible defaults and should not require manual specification unless customization is needed.
+
+### Truly Required parameters
+These parameters must always be specified in *config.json*:
 
 - `reference`  
-  Reference used for the input assembly.
+  Reference genome used for the analysis (e.g., `GRCh38`).
 
 - `lib_ROI`  
-  Indicates whether the input data originate from whole-genome sequencing
-  or targeted regions and used genetic material (e.g. `rna`, `wgs`).
+  Type of input data: `wgs` (whole-genome sequencing) or `rna` (RNA-seq). For RNA samples, the workflow automatically applies `SplitNCigarReads` processing.
 
-### Sample parameters
-- `sample_name`  
-  Sample identification.  
+- `globalResources`  
+  Path to global resources directory containing reference genomes and metadata.
+
+- `globalTmpdPath`  
+  Path to temporary directory for intermediate files.
+
+- `samples`  
+  Dictionary mapping sample identifiers to sample metadata. Each sample must have a `sample_name` field. For tumor-normal pairs, also include `donor` (patient ID) and `tumor_normal` ("tumor" or "normal").
+
+### Optional Metadata parameters
+- `task_name`  
+  Descriptive name for the analysis task.
 
 - `entity_name`  
-  Entity identification.
+  Entity/project identification.
 
-### Other parameters
-- `tumor_normal_paired`  
-  Samples are tumor-normal paired, default value `true`.
-- `somatic_use_strelka`  
-  Use strelka for somatic variant calling, default value `true`.
-- `somatic_use_vardict`  
-  Use vardict for somatic variant calling, default value `true`.
-- `somatic_use_mutect2`  
-  Use mutect2 for somatic variant calling, default value `true`.
-- `somatic_use_lofreq`  
-  Use lofreq for somatic variant calling, default value `true`.
-- `somatic_use_varscan`  
-  Use varscan for somatic variant calling, default value `true`.
-- `varscan_extra_params`  
-  Varscan: Extra parameters, default value `--strand-filter 0 --p-value 0.95 --min-var-freq 0.05`.
-- `somatic_use_muse`  
-  Use muse for somatic variant calling, default value `true`, needs tumor-normal pairs.
-- `somatic_use_somaticsniper`  
-  Use somaticsniper for somatic variant calling, default value `true`, needs tumor-normal pairs.
-- `min_variant_frequency`  
-  Vardict & Final Processing: Minimal variant frequency to report, default value `0`.
-- `donor`  
-  Patient ID, only for tumor-normal pairs.
-- `tumor_normal`  
-  Type of sample, expects values `tumor` or `normal`, only for tumor-normal pairs.
+### Analysis Mode
+- `tumor_normal_paired` (default: `true`)  
+  Set to `true` for tumor-normal paired samples, `false` for tumor-only analysis.
+
+### Variant Caller Configuration
+Enable or disable individual callers. All default to `true`; set to `false` to skip:
+
+- `somatic_use_strelka` — Strelka caller
+- `somatic_use_vardict` — VarDict caller
+- `somatic_use_mutect2` — GATK MuTect2 caller
+- `somatic_use_lofreq` — LoFreq caller
+- `somatic_use_varscan` — VarScan2 caller
+- `somatic_use_muse` — MuSE caller (requires tumor-normal pairs)
+- `somatic_use_somaticsniper` — SomaticSniper caller (requires tumor-normal pairs)
+
+### Fine-tuning Parameters
+- `varscan_extra_params` (default: `--strand-filter 0 --p-value 0.95 --min-var-freq 0.05`)  
+  Additional command-line arguments for VarScan2.
+
+- `min_variant_frequency` (default: `0`)  
+  Minimum allele frequency threshold for VarDict and final variant filtering.
 ## Usage
 The workflow is executed using Snakemake and requires a prepared configuration file and aligned BAM files for each sample. From the root directory of the repository, run:
 
@@ -69,54 +75,63 @@ For RNA samples (`lib_ROI: rna` in the config), the workflow automatically   gen
   
 ## Output
 ### Main outputs
-- `somatic_varcalls/*`  
-  Directory containing the final results of somatic variant calling for each sample, including individual variant caller outputs and consensus vcf files.  
+- `somatic_varcalls/{sample_name}/`  
+  Directory containing the final results for each sample.
+
+- `somatic_varcalls/{sample_name}.final_variants.tsv`  
+  Final consensus variant call set (combined from all enabled callers).
+
+- `somatic_varcalls/{sample_name}/{caller}/`  
+  Individual caller output directories (e.g., `varscan/`, `mutect2/`, `strelka/`, etc.), containing raw VCF files from each variant caller.
 
 ### Additional outputs
 
-- `config.json/`  
-  Snapshot of the configuration file used for the run, stored for reproducibility.
+- `somatic_varcalls/{sample_name}.RNAsplit.bam` (RNA-seq only)  
+  BAM file after SplitNCigarReads processing, used for variant calling on RNA samples.
 
-- `logs/`  
-  Log files generated by individual workflow steps and tools.
+- `logs/{sample_name}/callers/`  
+  Log files from individual variant caller runs.
+
+- `config.json` (snapshot)  
+  Copy of the configuration file used for this run, stored for reproducibility.
 
 ## Repository structure
 ```
 .
 ├── Snakefile                     
-├── workflow.config.json            
+├── README.md                        # This file
 ├── rules/                          
-│   ├── callers.smk         
-│   └── somaticseq.smk
+│   ├── callers.smk                  # Rules for individual variant callers
+│   └── somaticseq.smk               # Rules for SomaticSeq consensus calling
 ├── wrappers/                       
 │   ├── RNA_SplitNCigars/     
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── lofreq/     
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── muse/         
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── mutect2/        
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── postprocess_somaticseq_variants/
-│   │   ├── postprocess_somatiseq_variants.R     
-│   │   ├── scrip.py
+│   │   ├── postprocess_somaticseq_variants.R     
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── scalpel/
 │   │   ├── vcfsorter.pl     
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
-│   ├── soamticseq/         
-│   │   ├── scrip.py
+│   ├── somaticseq/          # Note: exact name for SomaticSeq wrapper
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── somaticsniper/        
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── strelka/        
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
 │   ├── vardict/
 │   │   ├── testsomatic.R
@@ -124,12 +139,12 @@ For RNA samples (`lib_ROI: rna` in the config), the workflow automatically   gen
 │   │   ├── var2vcf_paired.pl
 │   │   ├── var2vcf_somatic.pl
 │   │   ├── var2vcf_valid.pl
-│   │   ├── scrip.py
+│   │   ├── script.py
 │   │   └── env.yaml
 │   └── varscan/
 │       ├── combine_vcfs.R        
-│       ├── scrip.py
-│       └── env.yaml                  
-└── README.md
+│       ├── script.py
+│       └── env.yaml
+└── workflow.config.json
 ```
 
