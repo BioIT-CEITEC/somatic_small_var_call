@@ -35,7 +35,7 @@ else:
     config["lib_ROI"] = "wgs"
 
 #### Setting organism from reference
-f = open(os.path.join(GLOBAL_REF_PATH, "reference_info_test", "reference2.json"))
+f = open(os.path.join(os.path.dirname(GLOBAL_REF_PATH.rstrip("/")), "reference_info_test", "reference2.json"))
 reference_dict = json.load(f)
 f.close()
 config["species_name"] = [organism_name for organism_name in reference_dict.keys() if isinstance(reference_dict[organism_name],dict) and config["reference"] in reference_dict[organism_name].keys()][0]
