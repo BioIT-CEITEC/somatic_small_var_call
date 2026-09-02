@@ -23,7 +23,6 @@ else:
 
 # variant callers that have separate output files for SNVs and Indels
 
-
 def individual_caller_outputs(wildcards):
     output_list = [expand(eval('.'.join(['rules', varcaller, 'output'])),sample_name=wildcards.sample_name)
      for varcaller in available_varcallers.keys() if any([varcaller.find(config_caller) != -1 for config_caller in callers])]
@@ -52,9 +51,9 @@ rule somaticseq:
     input:
         unpack(bam_inputs),
         caller_output = individual_caller_outputs,
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference_dirname"])[0],
-        regions =  expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir = reference_directory,library_scope = config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/others/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0]
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions =  config["organism_dna_panel"], #defined in bioroots utilities
+        dbsnp = config["organism_dbsnp"] #defined in bioroots utilities
     output:
         snv="somatic_varcalls/{sample_name}/Consensus.sSNV.vcf",
         indel="somatic_varcalls/{sample_name}/Consensus.sINDEL.vcf"
@@ -68,7 +67,6 @@ rule somaticseq:
         inputflags = inputflags,
     conda:  "../wrappers/somaticseq/env.yaml"
     script: "../wrappers/somaticseq/script.py"
-
 
 rule postprocess_somaticseq_variants:
     input:

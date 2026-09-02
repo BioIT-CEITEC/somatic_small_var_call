@@ -27,8 +27,8 @@ def sample_orig_bam_names(wildcards):
 rule somaticsniper:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions= config["organism_dna_panel"], #defined in bioroots utilities
     output:
         vcf = "somatic_varcalls/{sample_name}/somaticsniper/SomaticSniper.vcf"
     log: "logs/{sample_name}/callers/somaticsniper.log"
@@ -42,9 +42,9 @@ rule somaticsniper:
 rule lofreq_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/others/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions= config["organism_dna_panel"], #defined in bioroots utilities
+        dbsnp = config["organism_dbsnp"], #defined in bioroots utilities
     output:
         snps="somatic_varcalls/{sample_name}/lofreq/somatic_final.snvs.vcf.gz",
         indels="somatic_varcalls/{sample_name}/lofreq/somatic_final.indels.vcf.gz"
@@ -60,9 +60,9 @@ rule lofreq_paired:
 rule lofreq_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/others/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions= config["organism_dna_panel"], #defined in bioroots utilities
+        dbsnp = config["organism_dbsnp"], #defined in bioroots utilities
     output:
         vcf="somatic_varcalls/{sample_name}/lofreq/Lofreq.vcf"
     log: "logs/{sample_name}/callers/lofreq.log"
@@ -77,9 +77,9 @@ rule lofreq_single:
 rule muse:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        dbsnp = expand("{ref_dir}/others/dbSNP/common_all.vcf.gz",ref_dir=reference_directory)[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions = config["organism_dna_panel"], #defined in bioroots utilities
+        dbsnp = config["organism_dbsnp"], #defined in bioroots utilities
     output:
         vcf = "somatic_varcalls/{sample_name}/muse/MuSE.vcf"
     log: "logs/{sample_name}/callers/muse.log"
@@ -95,9 +95,9 @@ rule muse:
 rule scalpel:
     input:
         unpack(bam_inputs),
-        ref=expand("{ref_dir}/seq/{ref_name}.fa",ref_dir = reference_directory,ref_name = config["reference_dirname"])[0],
-        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir = reference_directory,ref_name = config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        refdict = config["organism_dict"], #defined in bioroots utilities
+        regions = config["organism_dna_panel"], #defined in bioroots utilities
     output:
         vcf = "somatic_varcalls/{sample_name}/scalpel/Scalpel.vcf"
     log: "logs/{sample_name}/callers/scalpel.log"
@@ -113,8 +113,8 @@ rule scalpel:
 rule mutect2:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions = config["organism_dna_panel"],
     output:
         vcf = "somatic_varcalls/{sample_name}/mutect2/MuTect2.vcf"
     log: "logs/{sample_name}/callers/mutect2.log"
@@ -131,9 +131,9 @@ rule mutect2:
 rule strelka_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions_gz=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        regions_tbi=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions_gz = config["organism_dna_panel"] + ".gz", #defined in bioroots utilities
+        regions_tbi = config["organism_dna_panel"] + ".gz.tbi", #defined in bioroots utilities
     output:
         snps="somatic_varcalls/{sample_name}/strelka/results/variants/somatic.snvs.vcf.gz",
         indels="somatic_varcalls/{sample_name}/strelka/results/variants/somatic.indels.vcf.gz"
@@ -142,7 +142,7 @@ rule strelka_paired:
     resources:
         mem_mb=6000
     params: dir = os.path.join(GLOBAL_TMPD_PATH,"somatic_varcalls/{sample_name}/strelka"),
-            library_scope = config["lib_ROI"],
+            library_scope = config["lib_ROI"], #re-defined in bioroots utilities
             sample_material=config["material"],
             calling_type = config["tumor_normal_paired"],
             snps = os.path.join(GLOBAL_TMPD_PATH,"somatic_varcalls/{sample_name}/strelka/results/variants/somatic.snvs.vcf.gz"),
@@ -153,9 +153,9 @@ rule strelka_paired:
 rule strelka_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions_gz=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
-        regions_tbi=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed.gz.tbi",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions_gz = config["organism_dna_panel"] + ".gz", #defined in bioroots utilities
+        regions_tbi = config["organism_dna_panel"] + ".gz.tbi", #defined in bioroots utilities
     output:
         vcf="somatic_varcalls/{sample_name}/strelka/results/variants/variants.vcf.gz"
     log: "logs/{sample_name}/callers/strelka.log"
@@ -173,9 +173,9 @@ rule strelka_single:
 rule vardict:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        refdict=expand("{ref_dir}/seq/{ref_name}.dict",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        refdict = config["organism_dict"], #defined in bioroots utilities
+        regions = config["organism_dna_panel"], #defined in bioroots utilities
     output:
         vcf = "somatic_varcalls/{sample_name}/vardict/VarDict.vcf"
     log: "logs/{sample_name}/callers/vardict.log"
@@ -192,8 +192,8 @@ rule vardict:
 rule varscan_paired:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions = config["organism_dna_panel"], #defined in bioroots utilities
     output:
         snp="somatic_varcalls/{sample_name}/varscan/VarScan2.snp.vcf",
         indel="somatic_varcalls/{sample_name}/varscan/VarScan2.indel.vcf"
@@ -212,8 +212,8 @@ rule varscan_paired:
 rule varscan_single:
     input:
         unpack(bam_inputs),
-        ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0],
-        regions=expand("{ref_dir}/others/DNA_ROI/{library_scope}/{library_scope}.bed",ref_dir=reference_directory,library_scope=config["lib_ROI"])[0],
+        ref = config["organism_fasta"], #defined in bioroots utilities
+        regions = config["organism_dna_panel"], #defined in bioroots utilities
     output:
         vcf="somatic_varcalls/{sample_name}/varscan/VarScan2.vcf",
     log: "logs/{sample_name}/callers/varscan.log"
@@ -231,10 +231,9 @@ rule varscan_single:
     conda: "../wrappers/varscan/env.yaml"
     script: "../wrappers/varscan/script.py"
 
-
 rule RNA_SplitNCigars:
     input: bam = "mapped/{sample_name}.bam",
-           ref = expand("{ref_dir}/seq/{ref_name}.fa",ref_dir=reference_directory,ref_name=config["reference_dirname"])[0]
+           ref = config["organism_fasta"] #defined in bioroots utilities
     output: bam = "mapped/{sample_name}.RNAsplit.bam",
             bai = "mapped/{sample_name}.RNAsplit.bam.bai",
     log:    run = "logs/{sample_name}/callers/RNA_SplitNCigars.log",

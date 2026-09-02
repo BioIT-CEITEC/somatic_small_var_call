@@ -1,7 +1,7 @@
 {
   "workflow_description": {
     "name":"somatic_small_var_call",
-    "version": 1.2,
+    "version": 2.0,
     "label":"Somatic small variant calling",
     "type":"somatic_small_var_call",
     "run_parameters": {
@@ -22,7 +22,8 @@
     "sample_name"
   ],
   "requested_params": [
-    "reference",
+    "organism",
+    "assembly",
     "lib_ROI"
   ],
   "gui_params" : {
@@ -31,6 +32,22 @@
         "label": "Samples are tumor-normal paired",
         "type": "bool",
         "default": true
+      },
+      "calling_type": {
+        "type": "constant",
+        "default": "somatic"
+      },
+      "format": {
+        "label": "Result variant table format",
+        "type": "enum",
+        "dynamicEnumName": "small_var_format",
+        "filters": {
+          "group": {
+            "param": "calling_type",
+            "type": "value",
+            "showGroupLabel": false
+          }
+        }
       }
     },
     "detailed": {
@@ -134,4 +151,3 @@
     }
   }
 }
-
