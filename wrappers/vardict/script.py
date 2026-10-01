@@ -32,7 +32,7 @@ shell.executable("/bin/bash")
 # nic nevraci...
 version = str(subprocess.Popen("vardict-java 2>&1 | grep \"[Vv]ersion\" | cut -f 2 -d \" \"", shell=True, stdout=subprocess.PIPE).communicate()[0], 'utf-8')
 f = open(log_filename, 'a+')
-f.write("## VERSION: vardict-java 1.8.2 "+version+"\n")
+f.write("## VERSION: vardict-java "+version+"\n")
 f.close()
 
 #AttributeError: 'Wildcards' object has no attribute 'full_name'
