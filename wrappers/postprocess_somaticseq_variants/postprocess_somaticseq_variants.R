@@ -6,6 +6,25 @@ get_depth_and_bias_from_DP4_format <- function(DP4){
   return(list(rowSums(a),(a[,1] + a[,3]) / rowSums(a)))
 }
 
+# SomaticSeq builds the calling-decision INFO ID from the callers actually used (e.g. MVSDULK),
+# so read the ID and caller names from the header instead of hard-coding them
+get_caller_field <- function(vcf){
+  pattern <- '^##INFO=<ID=([A-Z]+),.*Description="Calling decision of the [0-9]+ algorithms: ([^"]*)">'
+  line <- grep(pattern, vcf@meta, value = T)
+  if(length(line) != 1) stop("SomaticSeq calling-decision INFO field not found in VCF header")
+  return(list(key = sub(pattern, "\\1", line),
+              tools = strsplit(sub(pattern, "\\2", line), ", ", fixed = T)[[1]]))
+}
+
+# comma-separated names of callers that called each variant (flags are 1/0/. in header order)
+decode_callers <- function(vcf){
+  field <- get_caller_field(vcf)
+  flags <- vcfR::extract.info(vcf, field$key)
+  if(!length(flags)) return(character(0))
+  hits <- as.matrix(as.data.table(tstrsplit(flags, ",", fixed = T))) == "1"
+  return(apply(hits, 1, function(x) paste(field$tools[x %in% TRUE], collapse = ",")))
+}
+
 run_all <- function(args){
   snp_var_file <- args[1]
   indel_var_file <- args[2]
@@ -25,7 +44,7 @@ run_all <- function(args){
                               ,normal_variant_freq = vcfR::extract.gt(vcf,element = "VAF",as.numeric = T)[,1]
                               ,normal_depth = vcfR::extract.gt(vcf,element = "DP4")[,1]
                               ,number_of_callers = vcfR::extract.info(vcf,"NUM_TOOLS")
-                              ,callers = vcfR::extract.info(vcf,"MVSDULK"))
+                              ,callers = decode_callers(vcf))
     
     if(nrow(snp_var_tab)){
       snp_var_tab[,c("tumor_depth","tumor_fwd_strand_pct") := get_depth_and_bias_from_DP4_format(tumor_depth)]
@@ -44,7 +63,7 @@ run_all <- function(args){
                                 ,normal_variant_freq = vcfR::extract.gt(vcf,element = "VAF",as.numeric = T)[,1]
                                 ,normal_depth = vcfR::extract.gt(vcf,element = "DP4")[,1]
                                 ,number_of_callers = vcfR::extract.info(vcf,"NUM_TOOLS")
-                                ,callers = vcfR::extract.info(vcf,"MVDLK"))
+                                ,callers = decode_callers(vcf))
     
     if(nrow(indel_var_tab)){
       indel_var_tab[,c("tumor_depth","tumor_fwd_strand_pct") := get_depth_and_bias_from_DP4_format(tumor_depth)]
@@ -64,7 +83,7 @@ run_all <- function(args){
                               ,tumor_variant_freq = vcfR::extract.gt(vcf,element = "VAF",as.numeric = T)[,1]
                               ,tumor_depth = vcfR::extract.gt(vcf,element = "DP4")[,1]
                               ,number_of_callers = vcfR::extract.info(vcf,"NUM_TOOLS")
-                              ,callers = vcfR::extract.info(vcf,"MVDLK"))
+                              ,callers = decode_callers(vcf))
     
     if(nrow(snp_var_tab)){
       snp_var_tab[,c("tumor_depth","tumor_fwd_strand_pct") := get_depth_and_bias_from_DP4_format(tumor_depth)]
@@ -80,7 +99,7 @@ run_all <- function(args){
                                 ,tumor_variant_freq = vcfR::extract.gt(vcf,element = "VAF",as.numeric = T)[,1]
                                 ,tumor_depth = vcfR::extract.gt(vcf,element = "DP4")[,1]
                                 ,number_of_callers = vcfR::extract.info(vcf,"NUM_TOOLS")
-                                ,callers = vcfR::extract.info(vcf,"MVDLK"))
+                                ,callers = decode_callers(vcf))
     
     if(nrow(indel_var_tab)){
       indel_var_tab[,c("tumor_depth","tumor_fwd_strand_pct") := get_depth_and_bias_from_DP4_format(tumor_depth)]
