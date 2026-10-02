@@ -88,27 +88,10 @@ rule muse:
         mem_mb=4000
     params: dir = "somatic_varcalls/{sample_name}/muse/MuSE",
             txt_res = "somatic_varcalls/{sample_name}/muse/MuSE.MuSE.txt",
-            threecol_bed_tmp = "somatic_varcalls/{sample_name}/muse/threecol_regions_tmp.bed"
+            threecol_bed_tmp = "somatic_varcalls/{sample_name}/muse/threecol_regions_tmp.bed",
+            library_scope = config["lib_ROI"]
     conda:  "../wrappers/muse/env.yaml"
     script: "../wrappers/muse/script.py"
-
-rule scalpel:
-    input:
-        unpack(bam_inputs),
-        ref = config["organism_fasta"], #defined in bioroots utilities
-        refdict = config["organism_dict"], #defined in bioroots utilities
-        regions = config["organism_dna_panel"], #defined in bioroots utilities
-    output:
-        vcf = "somatic_varcalls/{sample_name}/scalpel/Scalpel.vcf"
-    log: "logs/{sample_name}/callers/scalpel.log"
-    threads: 1
-    resources:
-        mem_mb=32000
-    params: dir = "somatic_varcalls/{sample_name}/scalpel",
-            db = "somatic_varcalls/{sample_name}/scalpel/main/somatic.db.dir",
-            calling_type = config["tumor_normal_paired"]
-    conda:  "../wrappers/scalpel/env.yaml"
-    script: "../wrappers/scalpel/script.py"
 
 rule mutect2:
     input:

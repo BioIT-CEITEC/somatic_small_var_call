@@ -18,7 +18,7 @@ shell.executable("/bin/bash")
 # f.write("## VERSION: vardict-java "+version+"\n")
 # f.close()
 
-command = "awk '{{ print $1, $2, $3 }}' " + snakemake.input.regions + " > " + snakemake.params.threecol_bed_tmp
+command = "awk -v OFS='\\t' '!/^(track|browser|#)/ {{ print $1, $2, $3 }}' " + snakemake.input.regions + " > " + snakemake.params.threecol_bed_tmp
 
 f = open(log_filename, 'at')
 f.write("## COMMAND: "+command+"\n")
@@ -45,11 +45,14 @@ f.write("## COMMAND: "+command+"\n")
 f.close()
 shell(command)
 
+# -G for WGS, -E for WES / targeted panels
+sump_mode = " -G " if snakemake.params.library_scope == "wgs" else " -E "
+
 command = "MuSE sump " +\
             " -I "+ snakemake.params.txt_res +\
             " -D "+ snakemake.input.dbsnp +\
             " -O "+ snakemake.output.vcf +\
-            " -E " +\
+            sump_mode +\
             " >> " + log_filename + " 2>&1"
 
 f = open(log_filename, 'at')
