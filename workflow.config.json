@@ -32,22 +32,6 @@
         "label": "Samples are tumor-normal paired",
         "type": "bool",
         "default": true
-      },
-      "calling_type": {
-        "type": "constant",
-        "default": "somatic"
-      },
-      "format": {
-        "label": "Result variant table format",
-        "type": "enum",
-        "dynamicEnumName": "small_var_format",
-        "filters": {
-          "group": {
-            "param": "calling_type",
-            "type": "value",
-            "showGroupLabel": false
-          }
-        }
       }
     },
     "detailed": {
@@ -75,7 +59,7 @@
         "label": "Use varscan for somatic variant calling.",
         "type": "bool",
         "default": true
-      },
+      },      
       "somatic_use_muse": {
         "label": "Use muse for somatic variant calling.",
         "type": "bool",
