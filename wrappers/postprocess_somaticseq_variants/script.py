@@ -23,6 +23,7 @@ command = "Rscript "+os.path.abspath(os.path.dirname(__file__))+"/postprocess_so
             snakemake.input.indel + " " +\
             snakemake.output.var_tab + " " +\
             calling_type_string + " " +\
+            snakemake.output.filtered_var_tab + " " +\
             " >> " + log_filename + " 2>&1"
 
 f = open(log_filename, 'at')

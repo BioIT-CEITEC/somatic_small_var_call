@@ -4,7 +4,6 @@ if config["tumor_normal_paired"] == True:
     available_varcallers = {
         "muse":"single_output",
         "mutect2":"single_output",
-        "scalpel":"single_output",
         "somaticsniper":"single_output",
         "vardict":"single_output",
         "lofreq_paired":"multi_output",
@@ -14,7 +13,6 @@ if config["tumor_normal_paired"] == True:
 else:
     available_varcallers = {
         "mutect2":"single_output",
-        "scalpel":"single_output",
         "vardict":"single_output",
         "lofreq_single":"single_output",
         "strelka_single":"single_output",
@@ -73,7 +71,8 @@ rule postprocess_somaticseq_variants:
         snv="somatic_varcalls/{sample_name}/Consensus.sSNV.vcf",
         indel="somatic_varcalls/{sample_name}/Consensus.sINDEL.vcf"
     output:
-        var_tab = "somatic_varcalls/{sample_name}.final_variants.tsv"
+        var_tab = "somatic_varcalls/{sample_name}.final_variants.tsv",
+        filtered_var_tab = "somatic_varcalls/{sample_name}.filtered_out_variants.tsv"
     log: "logs/{sample_name}/postprocess_somaticseq_variants.log"
     threads: 1
     resources:

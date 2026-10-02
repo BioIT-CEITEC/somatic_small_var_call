@@ -30,6 +30,7 @@ run_all <- function(args){
   indel_var_file <- args[2]
   output_file <- args[3]
   calling_type <- args[4]
+  filtered_output_file <- args[5]
   
   if(calling_type == "paired"){
     # SNV processing
@@ -176,26 +177,38 @@ run_all <- function(args){
   # }
   
   #FILTER CALLS
-  var_tab <- var_tab[filter == "PASS"]
-  
-  if(calling_type == "paired"){
-    var_tab <- var_tab[tumor_depth > 0 & tumor_variant_freq > 0 & normal_depth > 0]
-  } else {
-    var_tab <- var_tab[tumor_depth > 0 & tumor_variant_freq > 0]
+  # collect all failed filters per variant (NA counts as failed), so removed variants can be saved with their reasons
+  is_true <- function(x) x %in% TRUE
+  add_reason <- function(reason, failed, label){
+    ifelse(failed, ifelse(reason == "", label, paste0(reason, ",", label)), reason)
   }
-  var_tab[tumor_variant_freq > 1,tumor_variant_freq := 1]
-  
-  var_tab[,filter := NULL]
-  
-  var_tab[,var_name := paste0(chrom,"_",position,"_",reference,"/",alternative)]
-  setorder(var_tab,chrom,position,reference)
+  reason <- rep("", nrow(var_tab))
+  reason <- add_reason(reason, !is_true(var_tab$filter == "PASS"), paste0("FILTER=", var_tab$filter))
+  reason <- add_reason(reason, !is_true(var_tab$tumor_depth > 0), "no_tumor_depth")
+  reason <- add_reason(reason, !is_true(var_tab$tumor_variant_freq > 0), "no_tumor_vaf")
   if(calling_type == "paired"){
-    var_tab <- var_tab[,.(var_name,tumor_variant_freq,tumor_depth,normal_variant_freq,normal_depth,number_of_callers,callers,tumor_fwd_strand_pct,normal_fwd_strand_pct)]
-  } else {
-    var_tab <- var_tab[,.(var_name,tumor_variant_freq,tumor_depth,number_of_callers,callers,tumor_fwd_strand_pct)]
+    reason <- add_reason(reason, !is_true(var_tab$normal_depth > 0), "no_normal_depth")
   }
-  
+  var_tab[,filter_reason := reason]
+
+  if(calling_type == "paired"){
+    out_cols <- c("var_name","tumor_variant_freq","tumor_depth","normal_variant_freq","normal_depth","number_of_callers","callers","tumor_fwd_strand_pct","normal_fwd_strand_pct")
+  } else {
+    out_cols <- c("var_name","tumor_variant_freq","tumor_depth","number_of_callers","callers","tumor_fwd_strand_pct")
+  }
+
+  format_var_tab <- function(tab, cols){
+    tab[tumor_variant_freq > 1,tumor_variant_freq := 1]
+    tab[,var_name := paste0(chrom,"_",position,"_",reference,"/",alternative)]
+    setorder(tab,chrom,position,reference)
+    return(tab[,cols,with = F])
+  }
+
+  filtered_var_tab <- format_var_tab(var_tab[filter_reason != ""], c(out_cols,"filter_reason"))
+  var_tab <- format_var_tab(var_tab[filter_reason == ""], out_cols)
+
   fwrite(var_tab,file = output_file,sep = "\t")
+  fwrite(filtered_var_tab,file = filtered_output_file,sep = "\t")
   
   
 }
