@@ -13,7 +13,7 @@ This repository provides a Snakemake workflow for somatic small variant (SNV and
 | Caller | Version | Tumor–normal | Tumor-only |
 |---|---|---|---|
 | GATK Mutect2 + FilterMutectCalls | 4.1.5.0 | ✓ | ✓ |
-| Strelka2 | 2.9.7 | ✓ (somatic workflow) | - |
+| Strelka2 | 2.9.7 | ✓ | - |
 | VarDict-java | 1.8.3 | ✓ | ✓ |
 | LoFreq | 2.1.5 | ✓ | ✓ |
 | VarScan2 | 2.4.4 | ✓ | ✓ |
