@@ -4,6 +4,9 @@ run_all <- function(args){
   vcf1_file <- args[1]
   vcf2_file <- args[2]
   out_file <- args[3]
+  fai_file <- args[4]
+
+  contig_order <- as.character(fread(fai_file, header = FALSE, sep = "\t")$V1)
   
   rvcf1 <- readLines(vcf1_file)
   rvcf2 <- readLines(vcf2_file)
@@ -23,7 +26,8 @@ run_all <- function(args){
   tab2[,line := rvcf2]
   
   tab <- rbind(tab1,tab2)
-  setkey(tab)
+  tab[, chrom_idx := match(CHROM, contig_order)]
+  setorder(tab, chrom_idx, POS)
   
   res_vcf <- c(header,tab$line)
   cat(paste(paste0(res_vcf,"\n"),collapse = ""),file = out_file)

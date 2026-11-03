@@ -121,6 +121,7 @@ else:
                   " " + snakemake.params.snp + \
                   " " + snakemake.params.indel + \
                   " " + snakemake.output.vcf + \
+                  " " + snakemake.input.ref + ".fai" + \
                   " >> " + log_filename + " 2>&1"
 
         f = open(log_filename, 'at')
